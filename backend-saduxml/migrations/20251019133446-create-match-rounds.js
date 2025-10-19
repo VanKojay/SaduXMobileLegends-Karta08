@@ -2,48 +2,38 @@
 
 export default {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('matches', {
+    await queryInterface.createTable('match_rounds', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      group_id: {
+      match_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: 'matches', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      stage_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        references: { model: 'groups', key: 'id' },
+        references: { model: 'stages', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
-      team1_id: {
+      round_number: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'teams', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      },
-      team2_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: 'teams', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      },
-      round: {
-        type: Sequelize.STRING(100),
-        allowNull: true,
-      },
-      match_date: {
-        type: Sequelize.DATE,
-        allowNull: true,
+        comment: 'Ronde ke berapa (1, 2, 3, dst)',
       },
       score_team1: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        defaultValue: 0,
       },
       score_team2: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        defaultValue: 0,
       },
       winner_id: {
         type: Sequelize.INTEGER,
@@ -70,6 +60,6 @@ export default {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('matches');
+    await queryInterface.dropTable('match_rounds');
   },
 };

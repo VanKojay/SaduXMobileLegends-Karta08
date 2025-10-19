@@ -20,11 +20,7 @@ export async function up(queryInterface, Sequelize) {
       group_id: groupId,
       team1_id: teamId,
       team2_id: teamId, // sementara dummy
-      round: 'Group Stage',
       match_date: new Date(),
-      score_team1: 0,
-      score_team2: 0,
-      winner_id: null,
       status: 'pending',
       created_at: new Date(),
       updated_at: new Date(),

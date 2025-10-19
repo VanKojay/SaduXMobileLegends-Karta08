@@ -145,3 +145,46 @@ export const addMember = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const removeMember = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    const { memberId } = req.params;
+    if (!memberId) {
+      return res.status(400).json({ message: "Missing member ID" });
+    }
+
+    // Cari member-nya dulu
+    const member = await Member.findByPk(memberId);
+    if (!member) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    // Cek hak akses
+    if (user.type === "admin") {
+      // Admin bisa hapus siapa pun
+      await member.destroy();
+      return res.status(200).json({ message: "Member deleted by admin" });
+    }
+
+    if (user.type === "team") {
+      // Team hanya boleh hapus member milik timnya sendiri
+      if (member.team_id !== user.id) {
+        return res.status(403).json({ message: "You can only delete members from your own team" });
+      }
+
+      await member.destroy();
+      return res.status(200).json({ message: "Member deleted successfully" });
+    }
+
+    // Kalau tipe tidak dikenali
+    return res.status(403).json({ message: "Unauthorized user type" });
+  } catch (err) {
+    console.error("RemoveMember Error:", err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

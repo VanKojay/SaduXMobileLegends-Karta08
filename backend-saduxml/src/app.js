@@ -6,6 +6,10 @@ import { sequelize } from "./db.js";
 import authRoute from "./routes/auth.js";
 import eventsRoute from "./routes/events.js";
 import teamsRoute from "./routes/teams.js";
+import groupsRoute from "./routes/groups.js";
+import stagesRoute from "./routes/stages.js";
+import matchesRoute from "./routes/matches.js";
+import matchRoundsRoute from "./routes/matchRounds.js";
 
 dotenv.config();
 const app = express();
@@ -16,6 +20,10 @@ app.use("/api/health", healthRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/events", eventsRoute);
 app.use("/api/teams", teamsRoute);
+app.use("/api/groups", groupsRoute);
+app.use("/api/stages", stagesRoute);
+app.use("/api/matches", matchesRoute);
+app.use("/api/match-rounds", matchRoundsRoute);
 // Default route
 app.get("/", (req, res) => {
   res.send("SaduX Mobile Legends Backend is Live 🚀");
