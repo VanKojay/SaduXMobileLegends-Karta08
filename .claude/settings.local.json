@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree -L 3 -I \"node_modules\" \"d:\\Freelance\\git\\SaduXMobileLegends-Karta08\\frontend-saduxm\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
