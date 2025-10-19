@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree -L 3 -I \"node_modules\" \"d:\\Freelance\\git\\SaduXMobileLegends-Karta08\\frontend-saduxm\")"
+      "Bash(tree -L 3 -I \"node_modules\" \"d:\\Freelance\\git\\SaduXMobileLegends-Karta08\\frontend-saduxm\")",
+      "Bash(tree \"d:\\Freelance\\git\\SaduXMobileLegends-Karta08\\frontend-saduxml\\src\" -L 3)"
     ],
     "deny": [],
     "ask": []

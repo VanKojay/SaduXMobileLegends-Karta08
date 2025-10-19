@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Trophy, ChevronDown, ChevronUp, Sparkles, Calendar, Shield, Users } from 'lucide-react';
-import Sidebar from '../components/common/Sidebar';
+import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import LoginModal from '../components/modals/LoginModal';
 import RegisterModal from '../components/modals/RegisterModal';
@@ -43,18 +43,18 @@ const Landing = () => {
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Sidebar Navigation */}
-      <Sidebar 
+      {/* Header Navigation */}
+      <Header
         onLoginClick={() => setIsLoginModalOpen(true)}
         onRegisterClick={() => setIsRegisterModalOpen(true)}
       />
 
-      {/* Main Content - Add left padding for sidebar */}
-      <div className="relative z-10 ml-20">
+      {/* Main Content - Full Width */}
+      <div className="relative z-10">
         {/* ============================================ */}
         {/* SECTION 1: HERO - Clean & Focused */}
         {/* ============================================ */}
-        <section id="home" className="relative min-h-screen flex items-center justify-center py-20">
+        <section id="home" className="relative min-h-screen flex items-center justify-center py-20 pt-32">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center space-y-6">
               {/* Badge */}
