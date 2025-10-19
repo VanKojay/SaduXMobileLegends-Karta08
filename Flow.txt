@@ -1,0 +1,26 @@
+🧭 3. Flow Aplikasi (High-Level)
+🏠 Landing Page
+- Menampilkan informasi tentang turnamen (hero section, deskripsi, jadwal, sponsor, FAQ).
+- Tombol “Daftar Sekarang” membuka modal login/register.
+- Section pendaftaran: form input data (nama, email, tim, dsb).
+- Submit form → kirim data ke backend → kirim email verifikasi.
+
+📧 Email Verifikasi
+- User menerima email dengan link verifikasi (/verify?token=xxxxx).
+- Klik → token diverifikasi di backend → status user aktif.
+
+🔐 Login Modal
+- Modal login muncul tanpa pindah halaman.
+- Login via email + password → backend generate JWT token.
+- Token disimpan di localStorage (atau httpOnly cookie untuk keamanan).
+
+👨‍💼 Admin Dashboard
+- Login khusus admin (endpoint berbeda).
+--Halaman:
+- Dashboard: statistik jumlah peserta & status turnamen.
+- Pendaftaran: list peserta → tombol Approve/Reject.
+- Bracket Management: buat & atur pertandingan.
+
+⚔️ Live Bracket (Realtime)
+- Halaman publik dengan bracket yang terupdate otomatis (Socket.IO).
+- Admin bisa update skor/hasil → broadcast ke semua client secara realtime.
