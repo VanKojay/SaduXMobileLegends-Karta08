@@ -22,7 +22,7 @@ export const sendVerificationEmail = async (to, token) => {
     return;
   }
 
-  const url = `${process.env.APP_URL || "http://localhost:5000"}/api/auth/verify?token=${token}`;
+  const url = `${process.env.APP_URL || "http://localhost:3000"}/api/teams/verify?token=${token}`;
 
   await transporter.sendMail({
     from: FROM,

@@ -11,11 +11,10 @@ export const registerTeam = async (req, res) => {
     const { name, email, password } = req.body;
     if (!email || !password || !name) return res.status(400).json({ message: "Missing fields" });
 
-    const hashed = bcrypt.hashSync(password, 10);
     const verifyToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
     const verifyExpires = new Date(Date.now() + 60 * 60 * 1000);
 
-    const team = await Team.create({ name, email, password: hashed, verify_token: verifyToken, verify_expires: verifyExpires, verified: false });
+    const team = await Team.create({ name, email, password: password, verify_token: verifyToken, verify_expires: verifyExpires, verified: false });
     sendVerificationEmail(email, verifyToken).catch((e) => console.error("Email error", e));
     return res.status(201).json({ message: "Team registered. Check email to verify.", verificationToken: verifyToken });
   } catch (err) {
@@ -117,7 +116,7 @@ export const loginTeam = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: "Missing fields" });
-    const team = await Team.findOne({ where: { email } });
+    const team = await Team.scope("withPassword").findOne({ where: { email } });
     if (!team) return res.status(401).json({ message: "Invalid credentials" });
     if (!team.verified) return res.status(403).json({ message: "Team not verified" });
     const ok = bcrypt.compareSync(password, team.password);
