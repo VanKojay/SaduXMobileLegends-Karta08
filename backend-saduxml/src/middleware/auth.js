@@ -27,7 +27,7 @@ export const isNotMemberAllowedMiddleware = (req, res, next) => {
 }
 
 export const isAdminAllowedMiddleware = (req, res, next) => {
-  if (req.user.type !== "admin") return res.status(403).json({ message: "Forbidden" });
+  if (req.user.type !== "admin" && req.user.type !== "super_admin") return res.status(403).json({ message: "Forbidden" });
   next();
 }
 

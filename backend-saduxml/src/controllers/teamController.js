@@ -70,21 +70,41 @@ export const listTeams = async (req, res) => {
   const keyword = req.query.q || ''; // contoh: ?q=dwi
 
   try {
-    const teams = await Team.findAll({
-      include: [
-        {
-          model: Member,
-          attributes: ["id", "name"], // ambil kolom tertentu
-        },
-      ],
-      where: {
-        [Op.or]: [
-          { event_id: req.user.event_id },
-          { name: { [Op.like]: `%${keyword}%` } },
-          { email: { [Op.like]: `%${keyword}%` } },
+    let teams = []
+    if (req.user.type !== "super_admin") {
+      teams = await Team.findAll({
+        include: [
+          {
+            model: Member,
+            attributes: ["id", "name"], // ambil kolom tertentu
+          },
         ],
-      },
-    })
+        where: {
+          event_id: req.user.event_id,
+          [Op.or]: [
+            { name: { [Op.like]: `%${keyword}%` } },
+            { email: { [Op.like]: `%${keyword}%` } },
+          ]
+        },
+      })
+    } else {
+      teams = await Team.findAll({
+        include: [
+          {
+            model: Member,
+            attributes: ["id", "name"], // ambil kolom tertentu
+          },
+        ],
+        where: {
+          [Op.or]: [
+            { name: { [Op.like]: `%${keyword}%` } },
+            { email: { [Op.like]: `%${keyword}%` } },
+          ],
+        },
+      })
+    }
+
+    return res.json(teams)
   } catch (err) {
     console.error(err)
     return res.status(500).json({
@@ -130,14 +150,33 @@ export const listMembers = async (req, res) => {
 
 export const getTeam = async (req, res) => {
   try {
-    const team = await Team.findByPk(req.user.id, {
-      include: [
-        {
-          model: Member,
-          attributes: ["id", "name"], // ambil kolom tertentu
+    let team = []
+    if (req.user.type !== "super_admin") {
+      team = await Team.findOne({
+        where: {
+          id: req.user.id,
+          event_id: req.user.event_id
         },
-      ],
-    })
+        include: [
+          {
+            model: Member,
+            // attributes: ["id", "name"], // ambil kolom tertentu
+          },
+        ],
+      })
+    } else {
+      team = await Team.findOne({
+        where: {
+          id: req.user.id,
+        },
+        include: [
+          {
+            model: Member,
+            // attributes: ["id", "name"], // ambil kolom tertentu
+          },
+        ],
+      })
+    }
     if (!team) return res.status(404).json({ message: "Not found" });
     res.json(team);
   } catch (err) {
@@ -175,33 +214,16 @@ export const verifyTeam = async (req, res) => {
   }
 };
 
-export const loginTeam = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Missing fields" });
-    const team = await Team.scope("withPassword").findOne({ where: { email } });
-    if (!team) return res.status(401).json({ message: "Invalid credentials" });
-    if (!team.verified) return res.status(403).json({ message: "Team not verified" });
-    const ok = bcrypt.compareSync(password, team.password);
-    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
-    const token = jwt.sign({ id: team.id, email, type: "team" }, JWT_SECRET, { expiresIn: "7d" });
-    return res.json({ token });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 export const addMember = async (req, res) => {
   try {
     const teamId = req.user && req.user.id;
-    const eventId = req.user ? req?.user.event_id : req?.body?.event_id;
+    const eventId = req?.user?.event_id || req?.body?.event_id;
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
-    const { ml_id, name, email, phone } = req.body;
-    if (!ml_id || !name) return res.status(400).json({ message: "Missing fields" });
+    const { ml_id, name, email, phone, role } = req.body;
+    if (!ml_id || !role || !name || !email || !phone) return res.status(400).json({ message: "Missing required fields" });
     const count = await Member.count({ where: { team_id: teamId } });
     if (count >= 5) return res.status(400).json({ message: "Team member limit reached (5)" });
-    const member = await Member.create({ team_id: teamId, event_id: eventId, ml_id, name, email, phone });
+    const member = await Member.create({ team_id: teamId, event_id: eventId, ml_id, name, email, phone, role });
     return res.status(201).json(member);
   } catch (err) {
     console.error(err);
@@ -216,13 +238,19 @@ export const editMember = async (req, res) => {
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
 
     const { memberId } = req.params;
-    const { ml_id, name, email, phone } = req.body;
+    const { ml_id, name, email, phone, role } = req.body;
 
     // Pastikan memberId dikirim
     if (!memberId) return res.status(400).json({ message: "Missing memberId" });
+    if (!ml_id || !role || !name || !email || !phone) return res.status(400).json({ message: "Missing required fields" });
 
     // Cari member berdasarkan ID
-    const member = await Member.findOne({ where: { id: memberId } });
+    let member = [];
+    if (req.user.type !== "super_admin") {
+      member = await Member.findOne({ where: { id: memberId, event_id: req.user.event_id } });
+    } else {
+      member = await Member.findOne({ where: { id: memberId } });
+    }
     if (!member) return res.status(404).json({ message: "Member not found" });
 
     // Pastikan member milik tim yang sedang login
@@ -238,6 +266,7 @@ export const editMember = async (req, res) => {
     if (name) member.name = name;
     if (email) member.email = email;
     if (phone) member.phone = phone;
+    if (role) member.role = role;
 
     await member.save();
 
@@ -253,9 +282,6 @@ export const editMember = async (req, res) => {
 export const removeMember = async (req, res) => {
   try {
     const user = req.user;
-    if (!user) {
-      return res.status(401).json({ message: "Not authorized" });
-    }
 
     const { memberId } = req.params;
     if (!memberId) {
@@ -263,7 +289,14 @@ export const removeMember = async (req, res) => {
     }
 
     // Cari member-nya dulu
-    const member = await Member.findByPk(memberId);
+    let member = [];
+    if (user.type !== "super_admin") {
+      member = await Member.findOne({ id: memberId, event_id: user.event_id });
+    } else {
+      member = await Member.findOne({ id: memberId });
+
+    }
+
     if (!member) {
       return res.status(404).json({ message: "Member not found" });
     }

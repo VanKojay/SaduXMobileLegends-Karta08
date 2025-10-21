@@ -81,36 +81,36 @@ Team.hasMany(Member, { foreignKey: "team_id" });
 Member.belongsTo(Team, { foreignKey: "team_id" });
 
 // Group - GroupTeam
-Group.hasMany(GroupTeam, { foreignKey: "group_id", as: "groupTeams" });
-GroupTeam.belongsTo(Group, { foreignKey: "group_id", as: "group" });
+Group.hasMany(GroupTeam, { foreignKey: "group_id" });
+GroupTeam.belongsTo(Group, { foreignKey: "group_id" });
 
 // Team - GroupTeam
-Team.hasMany(GroupTeam, { foreignKey: "team_id", as: "groupTeams" });
-GroupTeam.belongsTo(Team, { foreignKey: "team_id", as: "team" });
+Team.hasMany(GroupTeam, { foreignKey: "team_id" });
+GroupTeam.belongsTo(Team, { foreignKey: "team_id" });
 
 // ====================================================================
 // 🔗 RELASI MATCH DAN STAGE
 // ====================================================================
 
 // Stage - Match
-Stage.hasMany(Match, { foreignKey: "stage_id", as: "matches" });
-Match.belongsTo(Stage, { foreignKey: "stage_id", as: "stage" });
+Stage.hasMany(Match, { foreignKey: "stage_id" });
+Match.belongsTo(Stage, { foreignKey: "stage_id" });
 
 // Stage - MatchRound
-Stage.hasMany(MatchRound, { foreignKey: "stage_id", as: "rounds" });
-MatchRound.belongsTo(Stage, { foreignKey: "stage_id", as: "stage" });
+Stage.hasMany(MatchRound, { foreignKey: "stage_id" });
+MatchRound.belongsTo(Stage, { foreignKey: "stage_id" });
 
 // Match - MatchRound
-Match.hasMany(MatchRound, { foreignKey: "match_id", as: "rounds" });
-MatchRound.belongsTo(Match, { foreignKey: "match_id", as: "match" });
+Match.hasMany(MatchRound, { foreignKey: "match_id" });
+MatchRound.belongsTo(Match, { foreignKey: "match_id" });
 
 // ====================================================================
 // 🔗 RELASI TEAM DALAM MATCH (team1, team2, winner)
 // ====================================================================
 
-Team.hasMany(Match, { foreignKey: "team1_id", as: "asTeam1" });
-Team.hasMany(Match, { foreignKey: "team2_id", as: "asTeam2" });
-Team.hasMany(Match, { foreignKey: "winner_id", as: "asWinner" });
+Team.hasMany(Match, { foreignKey: "team1_id", as: "Team1" });
+Team.hasMany(Match, { foreignKey: "team2_id", as: "Team2" });
+Team.hasMany(Match, { foreignKey: "winner_id", as: "Winner" });
 
 Match.belongsTo(Team, { foreignKey: "team1_id", as: "Team1" });
 Match.belongsTo(Team, { foreignKey: "team2_id", as: "Team2" });

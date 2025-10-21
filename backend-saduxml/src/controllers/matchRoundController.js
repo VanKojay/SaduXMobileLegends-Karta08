@@ -26,23 +26,45 @@ export const createMatchRound = async (req, res) => {
     }
 
     // ✅ Jika stage_id diisi, pastikan valid
+    let stage = [];
     if (stage_id) {
-      const stage = await Stage.findByPk(stage_id);
+      stage = await Stage.findByPk(stage_id);
       if (!stage) {
         return res.status(404).json({ message: "Stage tidak ditemukan." });
       }
     }
 
+    if (round_number > stage.best_of) {
+      return res.status(500).json({
+        message: "Round exceeds limit",
+      })
+    }
+
     // ✅ Buat MatchRound baru
-    const newRound = await MatchRound.create({
-      match_id,
-      stage_id: stage_id || null,
-      round_number,
-      score_team1: score_team1 || 0,
-      score_team2: score_team2 || 0,
-      winner_id: winner_id || null,
-      status: status || "pending",
-    });
+    let newRound = []
+    if (req.user.type !== "super_admin") {
+      newRound = await MatchRound.create({
+        match_id,
+        stage_id: stage_id || null,
+        round_number,
+        score_team1: score_team1 || 0,
+        score_team2: score_team2 || 0,
+        winner_id: winner_id || null,
+        status: status || "pending",
+        event_id: req.user.event_id
+      });
+    } else {
+      newRound = await MatchRound.create({
+        match_id,
+        stage_id: stage_id || null,
+        round_number,
+        score_team1: score_team1 || 0,
+        score_team2: score_team2 || 0,
+        winner_id: winner_id || null,
+        status: status || "pending",
+        event_id: req.body.event_id
+      });
+    }
 
     // ✅ Ambil ulang lengkap dengan relasi (biar respons langsung komplit)
     const createdRound = await MatchRound.findByPk(newRound.id, {
@@ -83,7 +105,18 @@ export const updateMatchRound = async (req, res) => {
     } = req.body;
 
     // 🔹 Cek apakah MatchRound ada
-    const matchRound = await MatchRound.findByPk(id);
+    let matchRound = []
+    if (req.user.type !== "super_admin") {
+      matchRound = await MatchRound.findOne({
+        id,
+        event_id: req.user.event_id
+      });
+    } else {
+      matchRound = await MatchRound.findOne({
+        id
+      });
+    }
+
     if (!matchRound) {
       return res.status(404).json({ message: "Match Round not found." });
     }
@@ -97,11 +130,18 @@ export const updateMatchRound = async (req, res) => {
     }
 
     // 🔹 Validasi stage_id (kalau dikirim dan tidak null)
+    let stage = []
     if (stage_id) {
-      const stage = await Stage.findByPk(stage_id);
+      stage = await Stage.findByPk(stage_id);
       if (!stage) {
         return res.status(400).json({ message: "Invalid stage_id: Stage not found." });
       }
+    }
+
+    if (round_number > stage.best_of) {
+      return res.status(500).json({
+        message: "Round exceeds limit",
+      })
     }
 
     // 🔹 Update data ronde
@@ -131,7 +171,15 @@ export const deleteMatchRound = async (req, res) => {
     const { id } = req.params;
 
     // 🔹 Cek apakah ronde ada
-    const matchRound = await MatchRound.findByPk(id);
+    let matchRound = [];
+    if (req.user.type !== "super_admin") {
+      matchRound = await MatchRound.findOne({
+        id,
+        event_id: req.user.event_id
+      });
+    } else {
+      matchRound = await MatchRound.findOne({id});
+    }
     if (!matchRound) {
       return res.status(404).json({ message: "Match Round not found." });
     }
@@ -152,59 +200,119 @@ export const listMatchRounds = async (req, res) => {
   const keyword = req.query.q || ''; // contoh: ?q=dwi
 
   try {
-    const matchRounds = await MatchRound.findAll({
-      attributes: ["id", "round_number", "score_team1", "score_team2", "winner_id", "status"],
-      include: [
-        {
-          model: Stage,
-          attributes: ["id", "name", "type", "order_number", "status"],
-          where: {
-            name: { [Op.like]: `%${keyword}%` },
+    let matchRounds = [];
+    if (req.user.type !== "super_admin") {
+      matchRounds = await MatchRound.findAll({
+        attributes: ["id", "round_number", "score_team1", "score_team2", "winner_id", "status"],
+        include: [
+          {
+            model: Stage,
+            attributes: ["id", "name", "type", "order_number", "status"],
+            where: {
+              name: { [Op.like]: `%${keyword}%` },
+            },
+            required: false, // biar nggak error kalau nggak ada Stage
           },
-          required: false, // biar nggak error kalau nggak ada Stage
+          {
+            model: Match,
+            attributes: ["id", "match_date", "team1_id", "team2_id", "winner_id", "group_id", "status", "round"],
+            include: [
+              {
+                model: Team,
+                as: "Team1",
+                attributes: ["id", "name", "email"],
+                include: [
+                  {
+                    model: Member,
+                    attributes: ["id", "name", "email"],
+                  },
+                ],
+              },
+              {
+                model: Team,
+                as: "Team2",
+                attributes: ["id", "name", "email"],
+                include: [
+                  {
+                    model: Member,
+                    attributes: ["id", "name", "email"],
+                  },
+                ],
+              },
+              {
+                model: Team,
+                as: "Winner",
+                attributes: ["id", "name", "email"],
+                include: [
+                  {
+                    model: Member,
+                    attributes: ["id", "name", "email"],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        where: {
+          event_id: req.user.event_id
         },
-        {
-          model: Match,
-          attributes: ["id", "match_date", "team1_id", "team2_id", "winner_id", "group_id", "status", "round"],
-          include: [
-            {
-              model: Team,
-              as: "Team1",
-              attributes: ["id", "name", "email"],
-              include: [
-                {
-                  model: Member,
-                  attributes: ["id", "name", "email"],
-                },
-              ],
+        order: [["round_number", "ASC"]],
+      });
+    } else {
+      matchRounds = await MatchRound.findAll({
+        attributes: ["id", "round_number", "score_team1", "score_team2", "winner_id", "status"],
+        include: [
+          {
+            model: Stage,
+            attributes: ["id", "name", "type", "order_number", "status"],
+            where: {
+              name: { [Op.like]: `%${keyword}%` },
             },
-            {
-              model: Team,
-              as: "Team2",
-              attributes: ["id", "name", "email"],
-              include: [
-                {
-                  model: Member,
-                  attributes: ["id", "name", "email"],
-                },
-              ],
-            },
-            {
-              model: Team,
-              as: "Winner",
-              attributes: ["id", "name", "email"],
-              include: [
-                {
-                  model: Member,
-                  attributes: ["id", "name", "email"],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      order: [["round_number", "ASC"]],
-    });
+            required: false, // biar nggak error kalau nggak ada Stage
+          },
+          {
+            model: Match,
+            attributes: ["id", "match_date", "team1_id", "team2_id", "winner_id", "group_id", "status", "round"],
+            include: [
+              {
+                model: Team,
+                as: "Team1",
+                attributes: ["id", "name", "email"],
+                include: [
+                  {
+                    model: Member,
+                    attributes: ["id", "name", "email"],
+                  },
+                ],
+              },
+              {
+                model: Team,
+                as: "Team2",
+                attributes: ["id", "name", "email"],
+                include: [
+                  {
+                    model: Member,
+                    attributes: ["id", "name", "email"],
+                  },
+                ],
+              },
+              {
+                model: Team,
+                as: "Winner",
+                attributes: ["id", "name", "email"],
+                include: [
+                  {
+                    model: Member,
+                    attributes: ["id", "name", "email"],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        order: [["round_number", "ASC"]],
+      });
+    }
 
     res.json(matchRounds);
   } catch (err) {
