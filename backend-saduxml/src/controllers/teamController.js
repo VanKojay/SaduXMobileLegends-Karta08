@@ -134,7 +134,7 @@ export const getTeam = async (req, res) => {
       include: [
         {
           model: Member,
-          attributes: ["id", "name"], // ambil kolom tertentu
+          // Return semua field member
         },
       ],
     })
@@ -197,11 +197,11 @@ export const addMember = async (req, res) => {
     const teamId = req.user && req.user.id;
     const eventId = req.user ? req?.user.event_id : req?.body?.event_id;
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
-    const { ml_id, name, email, phone } = req.body;
+    const { ml_id, name, email, phone, role } = req.body;
     if (!ml_id || !name) return res.status(400).json({ message: "Missing fields" });
     const count = await Member.count({ where: { team_id: teamId } });
     if (count >= 5) return res.status(400).json({ message: "Team member limit reached (5)" });
-    const member = await Member.create({ team_id: teamId, event_id: eventId, ml_id, name, email, phone });
+    const member = await Member.create({ team_id: teamId, event_id: eventId, ml_id, name, email, phone, role: role || 'Gold Lane' });
     return res.status(201).json(member);
   } catch (err) {
     console.error(err);
@@ -216,7 +216,7 @@ export const editMember = async (req, res) => {
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
 
     const { memberId } = req.params;
-    const { ml_id, name, email, phone } = req.body;
+    const { ml_id, name, email, phone, role } = req.body;
 
     // Pastikan memberId dikirim
     if (!memberId) return res.status(400).json({ message: "Missing memberId" });
@@ -230,7 +230,7 @@ export const editMember = async (req, res) => {
       return res.status(403).json({ message: "You don't have permission to edit this member" });
 
     // Validasi field minimal
-    if (!ml_id && !name && !email && !phone)
+    if (!ml_id && !name && !email && !phone && !role)
       return res.status(400).json({ message: "Nothing to update" });
 
     // Update data
@@ -238,6 +238,7 @@ export const editMember = async (req, res) => {
     if (name) member.name = name;
     if (email) member.email = email;
     if (phone) member.phone = phone;
+    if (role) member.role = role;
 
     await member.save();
 

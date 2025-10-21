@@ -84,6 +84,9 @@ const UserDashboard = () => {
       if (!memberForm.phone || !/^(\+62|62|0)[0-9]{9,12}$/.test(memberForm.phone)) {
         errors.phone = 'Nomor telepon tidak valid';
       }
+      if (!memberForm.role) {
+        errors.role = 'Pilih role/posisi';
+      }
 
       if (Object.keys(errors).length > 0) {
         setMemberErrors(errors);
@@ -92,8 +95,14 @@ const UserDashboard = () => {
         return;
       }
 
-      // Call API
-      await teamService.addMember(memberForm);
+      // Call API - event_id akan diambil dari teamInfo.event_id di backend
+      await teamService.addMember({
+        name: memberForm.name,
+        email: memberForm.email,
+        ml_id: memberForm.ml_id,
+        phone: memberForm.phone,
+        role: memberForm.role
+      });
       toast.success('Member berhasil ditambahkan!', { duration: 3000 });
 
       // Reset form dan close modal
@@ -117,9 +126,9 @@ const UserDashboard = () => {
     setSelectedMember(member);
     setMemberForm({
       name: member.name,
-      email: member.email,
+      email: member.email || '',
       ml_id: member.ml_id,
-      phone: member.phone,
+      phone: member.phone || '',
       role: member.role || 'Gold Lane',
     });
     setMemberErrors({});
@@ -134,7 +143,7 @@ const UserDashboard = () => {
     setIsSubmitting(true);
 
     try {
-      // Basic validation (same as add)
+      // Basic validation
       const errors = {};
       if (!memberForm.name || memberForm.name.trim().length < 3) {
         errors.name = 'Nama minimal 3 karakter';
@@ -148,6 +157,9 @@ const UserDashboard = () => {
       if (!memberForm.phone || !/^(\+62|62|0)[0-9]{9,12}$/.test(memberForm.phone)) {
         errors.phone = 'Nomor telepon tidak valid';
       }
+      if (!memberForm.role) {
+        errors.role = 'Pilih role/posisi';
+      }
 
       if (Object.keys(errors).length > 0) {
         setMemberErrors(errors);
@@ -157,7 +169,13 @@ const UserDashboard = () => {
       }
 
       // Call API
-      await teamService.updateMember(selectedMember.id, memberForm);
+      await teamService.updateMember(selectedMember.id, {
+        name: memberForm.name,
+        email: memberForm.email,
+        ml_id: memberForm.ml_id,
+        phone: memberForm.phone,
+        role: memberForm.role
+      });
       toast.success('Member berhasil diupdate!', { duration: 3000 });
 
       // Reset form dan close modal
@@ -234,7 +252,7 @@ const UserDashboard = () => {
     });
   };
 
-  const memberCount = teamInfo?.members?.length || 0;
+  const memberCount = teamInfo?.Members?.length || 0;
   const minMembers = 5;
   const progressPercentage = Math.min((memberCount / minMembers) * 100, 100);
 
@@ -404,7 +422,7 @@ const UserDashboard = () => {
                 )}
               </div>
 
-              {!teamInfo?.members || teamInfo.members.length === 0 ? (
+              {!teamInfo?.Members || teamInfo.Members.length === 0 ? (
                 <div className="text-center py-12">
                   <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-700 mx-auto mb-4" />
                   <p className="text-gray-400 mb-4 text-sm sm:text-base">Belum ada member di team Anda</p>
@@ -418,7 +436,7 @@ const UserDashboard = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  {teamInfo.members.map((member, index) => (
+                  {teamInfo.Members.map((member, index) => (
                     <div
                       key={index}
                       className="bg-gray-700/30 rounded-lg p-4 hover:bg-gray-700/50 transition-colors border border-gray-700/50"

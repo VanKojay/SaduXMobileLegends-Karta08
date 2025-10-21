@@ -1,12 +1,14 @@
-import { useState } from 'react';
-import { X, Mail, Lock, User, AlertCircle, Loader2, Eye, EyeOff, CheckCircle, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Mail, Lock, User, AlertCircle, Loader2, Eye, EyeOff, CheckCircle, Download, Calendar, Users as UsersIcon, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { validateTeamRegistration } from '../../utils/validators';
+import { eventService } from '../../services/api';
 import toast from 'react-hot-toast';
 import apiLogger from '../../utils/logger';
 
 const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
+    event_id: '',
     name: '',
     email: '',
     password: '',
@@ -17,7 +19,48 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const { register } = useAuth();
+
+  // Fetch active events when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchActiveEvents();
+    }
+  }, [isOpen]);
+
+  const fetchActiveEvents = async () => {
+    try {
+      setIsLoadingEvents(true);
+      const response = await eventService.listEvents();
+
+      // Filter events yang open & belum deadline & masih ada slot
+      const activeEvents = response.data.filter(event => {
+        const isOpen = event.status === 'open';
+        const notExpired = !event.registration_deadline ||
+                           new Date(event.registration_deadline) > new Date();
+        const hasSlot = (event.registered_teams || 0) < event.max_teams;
+
+        return isOpen && notExpired && hasSlot;
+      });
+
+      setEvents(activeEvents);
+
+      // Auto-select jika hanya ada 1 event
+      if (activeEvents.length === 1) {
+        setFormData(prev => ({ ...prev, event_id: activeEvents[0].id }));
+        setSelectedEvent(activeEvents[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast.error('Gagal memuat daftar event');
+      setEvents([]);
+    } finally {
+      setIsLoadingEvents(false);
+    }
+  };
 
   // Handle input change
   const handleChange = (e) => {
@@ -74,6 +117,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
       // Call register API
       console.log('Calling register API...');
       const result = await register({
+        event_id: formData.event_id,
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -104,11 +148,14 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   const handleSuccessClose = () => {
     setIsSuccess(false);
     setFormData({
+      event_id: '',
       name: '',
       email: '',
       password: '',
       confirmPassword: '',
     });
+    setSelectedEvent(null);
+    setErrors({});
     onClose();
   };
 
@@ -161,6 +208,99 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                   <p className="text-sm text-red-400">{errors.general}</p>
                 </div>
               )}
+
+              {/* Event Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Pilih Event <span className="text-red-400">*</span>
+                </label>
+
+                {isLoadingEvents ? (
+                  <div className="flex items-center justify-center py-8 bg-gray-800 rounded-lg border border-gray-700">
+                    <Loader2 className="w-6 h-6 text-indigo-400 animate-spin mr-2" />
+                    <span className="text-gray-400">Memuat event...</span>
+                  </div>
+                ) : events.length === 0 ? (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <p className="text-sm text-red-400 text-center">
+                      Tidak ada event aktif saat ini. Silakan coba lagi nanti.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {events.map((event) => {
+                      const slotsLeft = event.max_teams - (event.registered_teams || 0);
+                      const deadlineDate = event.registration_deadline
+                        ? new Date(event.registration_deadline).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })
+                        : 'Tidak ada deadline';
+
+                      return (
+                        <label
+                          key={event.id}
+                          className={`block p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            formData.event_id === event.id
+                              ? 'border-indigo-500 bg-indigo-500/10'
+                              : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="event_id"
+                            value={event.id}
+                            checked={formData.event_id === event.id}
+                            onChange={(e) => {
+                              setFormData(prev => ({ ...prev, event_id: parseInt(e.target.value) }));
+                              setSelectedEvent(event);
+                              if (errors.event_id) {
+                                setErrors(prev => ({ ...prev, event_id: '' }));
+                              }
+                            }}
+                            className="sr-only"
+                          />
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className={`font-bold text-base mb-2 ${
+                                formData.event_id === event.id ? 'text-indigo-400' : 'text-white'
+                              }`}>
+                                {event.title}
+                              </h3>
+                              <div className="space-y-1 text-xs text-gray-400">
+                                <div className="flex items-center space-x-2">
+                                  <Calendar className="w-3 h-3" />
+                                  <span>Deadline: {deadlineDate}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <UsersIcon className="w-3 h-3" />
+                                  <span className={slotsLeft < 10 ? 'text-yellow-400 font-semibold' : ''}>
+                                    Slot: {slotsLeft}/{event.max_teams} tersisa
+                                  </span>
+                                </div>
+                                {event.venue && (
+                                  <div className="flex items-center space-x-2">
+                                    <MapPin className="w-3 h-3" />
+                                    <span>{event.venue}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            {formData.event_id === event.id && (
+                              <CheckCircle className="w-5 h-5 text-indigo-400 flex-shrink-0 ml-2" />
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {errors.event_id && (
+                  <p className="mt-1 text-sm text-red-400">{errors.event_id}</p>
+                )}
+              </div>
 
               {/* Team Name Field */}
               <div>

@@ -50,15 +50,20 @@ export const sanitizeInput = (input) => {
 // Validasi form registrasi team
 export const validateTeamRegistration = (formData) => {
   const errors = {};
-  
+
+  // Event ID validation
+  if (!formData.event_id) {
+    errors.event_id = 'Pilih event terlebih dahulu';
+  }
+
   if (!formData.name || formData.name.trim().length < 3) {
     errors.name = 'Nama team minimal 3 karakter';
   }
-  
+
   if (!formData.email || !validateEmail(formData.email)) {
     errors.email = 'Email tidak valid';
   }
-  
+
   if (!formData.password) {
     errors.password = 'Password wajib diisi';
   } else {
@@ -67,11 +72,11 @@ export const validateTeamRegistration = (formData) => {
       errors.password = passwordValidation.errors[0];
     }
   }
-  
+
   if (formData.password !== formData.confirmPassword) {
     errors.confirmPassword = 'Password tidak cocok';
   }
-  
+
   return {
     isValid: Object.keys(errors).length === 0,
     errors,

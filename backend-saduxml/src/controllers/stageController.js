@@ -1,6 +1,8 @@
 // import bcrypt from "bcryptjs";
 import { Op } from "sequelize";
 import { MatchRound, Stage, Team, Member, Match } from "../db.js";
+import { io } from "../app.js";
+import { emitStageUpdate, emitBracketUpdate } from "../socket.js";
 
 export const createStage = async (req, res) => {
   try {
@@ -71,49 +73,68 @@ export const deleteStage = async (req, res) => {
 };
 
 export const listStages = async (req, res) => {
-  const keyword = req.query.q || ''; // contoh: ?q=dwi
+  const keyword = req.query.q || '';
+  const eventId = req.query.event_id || (req.user ? req.user.event_id : null);
 
   try {
+    // Build where clause
+    const whereClause = {
+      [Op.and]: [
+        {
+          [Op.or]: [
+            { name: { [Op.like]: `%${keyword}%` } },
+          ],
+        }
+      ]
+    };
+
+    // Filter by event_id if provided or if user is admin
+    if (eventId) {
+      whereClause[Op.and].push({ event_id: eventId });
+    }
+
     const stageList = await Stage.findAll({
       include: [
         {
           model: MatchRound,
-          attributes: ["id", "round_number", "score_team1", "score_team2", "winner_id", 'status'], // ambil kolom tertentu
+          as: "rounds",
+          attributes: ["id", "round_number", "score_team1", "score_team2", "winner_id", 'status'],
           include: [
             {
               model: Match,
-              attributes: ["id", "match_date", "team1_id", "team2_id", "winner_id", "group_id", "status", "round"], // kolom Team yang mau diambil
+              as: "match",
+              attributes: ["id", "match_date", "team1_id", "team2_id", "winner_id", "group_id", "status", "round", "score_team1", "score_team2"],
               include: [
                 {
                   model: Team,
                   as: "Team1",
-                  attributes: ["id", "name", "email"], // kolom Team yang mau diambil
+                  attributes: ["id", "name", "email"],
                   include: [
                     {
                       model: Member,
-                      attributes: ["id", "name", "email"], // kolom Team yang mau diambil
+                      attributes: ["id", "name", "email", "ml_id", "role"],
                     },
                   ],
                 },
                 {
                   model: Team,
                   as: "Team2",
-                  attributes: ["id", "name", "email"], // kolom Team yang mau diambil
+                  attributes: ["id", "name", "email"],
                   include: [
                     {
                       model: Member,
-                      attributes: ["id", "name", "email"], // kolom Team yang mau diambil
+                      attributes: ["id", "name", "email", "ml_id", "role"],
                     },
                   ],
                 },
                 {
                   model: Team,
                   as: "Winner",
-                  attributes: ["id", "name", "email"], // kolom Team yang mau diambil
+                  attributes: ["id", "name", "email"],
                   include: [
                     {
                       model: Member,
-                      attributes: ["id", "name", "email"], // kolom Team yang mau diambil
+                      attributes: ["id", "name", "email", "ml_id", "role"],
                     },
                   ],
                 },
@@ -122,11 +143,8 @@ export const listStages = async (req, res) => {
           ]
         },
       ],
-      where: {
-        [Op.or]: [
-          { name: { [Op.like]: `%${keyword}%` } },
-        ],
-      },
+      where: whereClause,
+      order: [['order_number', 'ASC']]
     })
 
     res.json(stageList);

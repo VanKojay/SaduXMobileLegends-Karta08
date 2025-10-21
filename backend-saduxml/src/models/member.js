@@ -58,6 +58,13 @@ export default (sequelize) => {
         type: DataTypes.STRING(50),
         allowNull: true,
       },
+
+      role: {
+        type: DataTypes.ENUM('EXP Lane', 'Gold Lane', 'Mid Lane', 'Jungler', 'Roam'),
+        allowNull: false,
+        defaultValue: 'Gold Lane',
+        comment: "Posisi/role player dalam game (EXP/Gold/Mid/Jungler/Roam)",
+      },
     },
     {
       tableName: "members",
