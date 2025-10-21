@@ -11,6 +11,16 @@ export const registerTeam = async (req, res) => {
     const { name, email, password } = req.body;
     if (!email || !password || !name) return res.status(400).json({ message: "Missing fields" });
 
+    const checkEmail = await Team.findOne({
+      email: email
+    });
+    console.log(checkEmail);
+    if (checkEmail) {
+      return res.status(500).json({
+        message: "Email already use"
+      })
+    }
+    
     const verifyToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
     const verifyExpires = new Date(Date.now() + 60 * 60 * 1000);
 
@@ -142,6 +152,46 @@ export const addMember = async (req, res) => {
   } catch (err) {
     console.error(err);
     if (err.name === "SequelizeUniqueConstraintError") return res.status(409).json({ message: "Member unique constraint" });
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const editMember = async (req, res) => {
+  try {
+    const teamId = req.user && req.user.id;
+    if (!teamId) return res.status(401).json({ message: "Not authorized" });
+
+    const { memberId } = req.params;
+    const { ml_id, name, email, phone } = req.body;
+
+    // Pastikan memberId dikirim
+    if (!memberId) return res.status(400).json({ message: "Missing memberId" });
+
+    // Cari member berdasarkan ID
+    const member = await Member.findOne({ where: { id: memberId } });
+    if (!member) return res.status(404).json({ message: "Member not found" });
+
+    // Pastikan member milik tim yang sedang login
+    if (member.team_id !== teamId)
+      return res.status(403).json({ message: "You don't have permission to edit this member" });
+
+    // Validasi field minimal
+    if (!ml_id && !name && !email && !phone)
+      return res.status(400).json({ message: "Nothing to update" });
+
+    // Update data
+    if (ml_id) member.ml_id = ml_id;
+    if (name) member.name = name;
+    if (email) member.email = email;
+    if (phone) member.phone = phone;
+
+    await member.save();
+
+    return res.status(200).json({ message: "Member updated successfully", member });
+  } catch (err) {
+    console.error(err);
+    if (err.name === "SequelizeUniqueConstraintError")
+      return res.status(409).json({ message: "Member unique constraint" });
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
