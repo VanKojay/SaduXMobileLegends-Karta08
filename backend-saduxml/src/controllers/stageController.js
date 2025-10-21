@@ -9,7 +9,11 @@ export const createStage = async (req, res) => {
     const { name, type, order_number, status } = req.body;
     if (!name || !order_number || !type || !status) return res.status(400).json({ message: "Missing fields" });
 
-    await Stage.create({ name, type, order_number, status });
+    if (req.user.type !== "super_admin") {
+      await Stage.create({ name, type, order_number, status, event_id: req.user.event_id });
+    } else {
+      await Stage.create({ name, type, order_number, status, event_id: req.body.event_id });
+    }
     return res.status(201).json({ message: "Stage created successfully." });
   } catch (err) {
     console.error(err);
@@ -28,7 +32,15 @@ export const updateStage = async (req, res) => {
     }
 
     // Cek apakah stage dengan ID tersebut ada
-    const stage = await Stage.findByPk(id);
+    let stage = [];
+    if (req.user.type !== "super_admin") {
+      stage = await Stage.findOne({
+        id,
+        event_id: req.user.event_id
+      });
+    } else {
+      stage = await Stage.findOne(id);
+    }
     if (!stage) {
       return res.status(404).json({ message: "Stage not found." });
     }
@@ -57,7 +69,17 @@ export const deleteStage = async (req, res) => {
     const { id } = req.params;
 
     // Cek apakah stage ada
-    const stage = await Stage.findByPk(id);
+    let stage = []
+    if (req.user.type !== "super_admin") {
+      stage = await Stage.findOne({
+        id,
+        event_id: req.user.event_id
+      });
+    } else {
+      stage = await Stage.findOne({
+        id,
+      });
+    }
     if (!stage) {
       return res.status(404).json({ message: "Stage not found." });
     }
@@ -77,6 +99,7 @@ export const listStages = async (req, res) => {
   const eventId = req.query.event_id || (req.user ? req.user.event_id : null);
 
   try {
+<<<<<<< HEAD
     // Build where clause
     const whereClause = {
       [Op.and]: [
@@ -94,6 +117,10 @@ export const listStages = async (req, res) => {
     }
 
     const stageList = await Stage.findAll({
+=======
+    let stageList = []
+    stageList = await Stage.findAll({
+>>>>>>> e1c8ac4356999dd5fc0b52074ad2feb53dd375c0
       include: [
         {
           model: MatchRound,
@@ -143,8 +170,17 @@ export const listStages = async (req, res) => {
           ]
         },
       ],
+<<<<<<< HEAD
       where: whereClause,
       order: [['order_number', 'ASC']]
+=======
+      where: {
+        event_id: req.query.event_id,
+        [Op.or]: [
+          { name: { [Op.like]: `%${keyword}%` } },
+        ],
+      },
+>>>>>>> e1c8ac4356999dd5fc0b52074ad2feb53dd375c0
     })
 
     res.json(stageList);

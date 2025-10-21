@@ -45,6 +45,14 @@ export default (sequelize) => {
         },
       },
 
+      role: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: "Role tidak boleh kosong" },
+        },
+      },
+
       email: {
         type: DataTypes.STRING(191),
         allowNull: true,

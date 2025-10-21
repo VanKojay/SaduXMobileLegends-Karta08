@@ -43,6 +43,11 @@ export default {
         comment: 'ID Mobile Legends player',
       },
 
+      role: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
+
       name: {
         type: Sequelize.STRING(191),
         allowNull: false,
