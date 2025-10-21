@@ -105,32 +105,113 @@ export const authService = {
   },
 };
 
-// Team Services
+// Team Services (User)
 export const teamService = {
-  // Get info team saat ini
+  // Get info team saat ini (authenticated user)
   getTeamInfo: () => api.get('/teams/get-team'),
+  
+  // Get members dari team saat ini
+  getMembers: () => api.get('/teams/get-members'),
   
   // Add member ke team
   addMember: (memberData) => api.post('/teams/members', memberData),
   
-  // List semua team (untuk admin)
-  listTeams: (query = '') => api.get(`/teams/?q=${query}`),
+  // Update member
+  updateMember: (memberId, memberData) => api.put(`/teams/members/${memberId}`, memberData),
+  
+  // Delete member dari team
+  deleteMember: (memberId) => api.delete(`/teams/remove-members/?memberId=${memberId}`),
 };
 
-// Admin Services (akan ditambahkan sesuai API yang tersedia)
+// Group Services (User & Admin)
+export const groupService = {
+  // List all groups
+  listGroups: (query = '') => api.get(`/groups/?q=${query}`),
+  
+  // Create group (Admin only)
+  createGroup: (groupData) => api.post('/groups/', groupData),
+};
+
+// Stage Services (User & Admin)
+export const stageService = {
+  // List all stages
+  listStages: (query = '') => api.get(`/stages/?q=${query}`),
+  
+  // Create stage (Admin only)
+  createStage: (stageData) => api.post('/stages/', stageData),
+  
+  // Update stage (Admin only)
+  updateStage: (stageId, stageData) => api.put(`/stages/${stageId}`, stageData),
+  
+  // Delete stage (Admin only)
+  deleteStage: (stageId) => api.delete(`/stages/${stageId}`),
+};
+
+// Match Services (User & Admin)
+export const matchService = {
+  // List all matches
+  listMatches: (query = '') => api.get(`/matches/?q=${query}`),
+  
+  // Create match (Admin only)
+  createMatch: (matchData) => api.post('/matches/', matchData),
+  
+  // Update match (Admin only)
+  updateMatch: (matchId, matchData) => api.put(`/matches/${matchId}`, matchData),
+  
+  // Delete match (Admin only)
+  deleteMatch: (matchId) => api.delete(`/matches/${matchId}`),
+};
+
+// Match Round Services (User & Admin)
+export const matchRoundService = {
+  // List all match rounds
+  listMatchRounds: (query = '') => api.get(`/match-rounds/?q=${query}`),
+  
+  // Create match round (Admin only)
+  createMatchRound: (roundData) => api.post('/match-rounds/', roundData),
+  
+  // Update match round (Admin only)
+  updateMatchRound: (roundId, roundData) => api.put(`/match-rounds/${roundId}`, roundData),
+  
+  // Delete match round (Admin only)
+  deleteMatchRound: (roundId) => api.delete(`/match-rounds/${roundId}`),
+};
+
+// Admin Services
 export const adminService = {
+  // Teams Management
+  teams: {
+    // List all teams
+    list: (query = '') => api.get(`/teams/?q=${query}`),
+  },
+
+  // Approve team - Update status to approved
+  // Note: Adjust endpoint format based on your backend implementation
+  // Option 1: PUT /teams/:id/status with body { status: 'approved' }
+  // Option 2: POST /admin/teams/:id/approve
+  approveTeam: (teamId) => api.put(`/teams/${teamId}/status`, { status: 'approved' }),
+
+  // Reject team - Update status to rejected
+  rejectTeam: (teamId) => api.put(`/teams/${teamId}/status`, { status: 'rejected' }),
+
   // Dashboard stats
   getDashboardStats: () => api.get('/admin/dashboard'),
-  
-  // Approve team
-  approveTeam: (teamId) => api.post(`/admin/teams/${teamId}/approve`),
-  
-  // Reject team
-  rejectTeam: (teamId) => api.post(`/admin/teams/${teamId}/reject`),
-  
-  // Bracket management
-  getBracket: () => api.get('/admin/bracket'),
-  updateMatch: (matchId, matchData) => api.put(`/admin/bracket/${matchId}`, matchData),
+};
+
+// Bracket Services (Admin & User)
+export const bracketService = {
+  // Generate bracket for a stage (Admin only)
+  // bracketConfig: { stageId, type: 'single_elimination', seeding: 'random' | 'sequential' | 'manual', teamIds: [] }
+  generateBracket: (bracketConfig) => api.post('/brackets/generate', bracketConfig),
+
+  // Get bracket structure for visualization
+  getBracketStructure: (stageId) => api.get(`/brackets/structure/${stageId}`),
+
+  // Update match from bracket view (Admin only)
+  updateBracketMatch: (matchId, matchData) => api.put(`/brackets/matches/${matchId}`, matchData),
+
+  // Get full bracket with matches grouped by rounds
+  getFullBracket: (stageId) => api.get(`/brackets/${stageId}`),
 };
 
 export default api;

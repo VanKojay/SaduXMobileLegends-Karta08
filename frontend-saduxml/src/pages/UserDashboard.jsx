@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Users, Mail, Shield, Trophy, UserPlus, X, Phone, Gamepad2, Edit2, Trash2, Calendar, Hash } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { teamService } from '../services/api';
@@ -7,7 +6,6 @@ import toast from 'react-hot-toast';
 import DashboardHeader from '../components/common/DashboardHeader';
 
 const UserDashboard = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [teamInfo, setTeamInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -188,8 +186,8 @@ const UserDashboard = () => {
   const handleDeleteConfirm = async () => {
     setIsSubmitting(true);
     try {
-      // Call API (Note: API endpoint might need to be created)
-      // await teamService.deleteMember(selectedMember.id);
+      // Call API
+      await teamService.deleteMember(selectedMember.id);
       toast.success(`${selectedMember.name} berhasil dihapus dari tim!`, { duration: 3000 });
 
       setIsDeleteModalOpen(false);

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, User, Shield, Trophy, Home, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const DashboardHeader = ({ title = 'Dashboard', subtitle = 'Team Management' }) => {
+const DashboardHeader = ({ title = 'Dashboard' }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated, user, logout, isAdmin } = useAuth();

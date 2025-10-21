@@ -1,14 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Users, Search, Filter, CheckCircle, XCircle, LogOut, Menu, X, Trophy, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { teamService, adminService } from '../../services/api';
+import { useState, useEffect, useCallback } from 'react';
+import { Users, Search, Filter, CheckCircle, XCircle, X, Eye } from 'lucide-react';
+import AdminLayout from '../../components/admin/AdminLayout';
+import { adminService } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const TeamManagement = () => {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [teams, setTeams] = useState([]);
   const [filteredTeams, setFilteredTeams] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,12 +19,12 @@ const TeamManagement = () => {
 
   useEffect(() => {
     filterTeams();
-  }, [teams, searchQuery, filterStatus]);
+  }, [filterTeams]);
 
   const fetchTeams = async () => {
     try {
       setIsLoading(true);
-      const response = await teamService.listTeams();
+      const response = await adminService.teams.list();
       setTeams(response.data);
     } catch (error) {
       console.error('Error fetching teams:', error);
@@ -38,7 +34,7 @@ const TeamManagement = () => {
     }
   };
 
-  const filterTeams = () => {
+  const filterTeams = useCallback(() => {
     let filtered = [...teams];
 
     // Filter by search query
@@ -56,7 +52,7 @@ const TeamManagement = () => {
     }
 
     setFilteredTeams(filtered);
-  };
+  }, [teams, searchQuery, filterStatus]);
 
   const handleApprove = async (teamId) => {
     try {
@@ -87,11 +83,6 @@ const TeamManagement = () => {
     setIsDetailModalOpen(true);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
   const statusColors = {
     pending: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     approved: 'bg-green-500/20 text-green-400 border-green-500/30',
@@ -99,81 +90,9 @@ const TeamManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 text-white flex">
-      {/* Sidebar */}
-      <aside
-        className={`${
-          isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-gray-900/90 backdrop-blur-lg border-r border-gray-800 transition-all duration-300 fixed h-full z-30`}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-8">
-            {isSidebarOpen && (
-              <div className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">S</span>
-                </div>
-                <span className="text-xl font-bold">Admin Panel</span>
-              </div>
-            )}
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-gray-800 rounded-lg"
-            >
-              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-
-          <nav className="space-y-2">
-            <button
-              onClick={() => navigate('/admin')}
-              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg transition-colors"
-            >
-              <Trophy className="w-5 h-5" />
-              {isSidebarOpen && <span>Dashboard</span>}
-            </button>
-            <button
-              onClick={() => navigate('/admin/teams')}
-              className="w-full flex items-center space-x-3 px-4 py-3 bg-indigo-500/20 text-indigo-400 rounded-lg"
-            >
-              <Users className="w-5 h-5" />
-              {isSidebarOpen && <span>Teams</span>}
-            </button>
-            <button
-              onClick={() => navigate('/bracket')}
-              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-800 rounded-lg transition-colors"
-            >
-              <Trophy className="w-5 h-5" />
-              {isSidebarOpen && <span>Bracket</span>}
-            </button>
-          </nav>
-
-          <div className="absolute bottom-6 left-6 right-6">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center space-x-3 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              {isSidebarOpen && <span>Logout</span>}
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main
-        className={`flex-1 ${
-          isSidebarOpen ? 'ml-64' : 'ml-20'
-        } transition-all duration-300 p-8`}
-      >
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Team Management</h1>
-          <p className="text-gray-400">Kelola pendaftaran team dan status approval</p>
-        </div>
-
-        {/* Filters & Search */}
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-6">
+    <AdminLayout title="Team Management" subtitle="Kelola pendaftaran team dan status approval">
+      {/* Filters & Search */}
+      <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
@@ -287,7 +206,6 @@ const TeamManagement = () => {
             </div>
           )}
         </div>
-      </main>
 
       {/* Detail Modal */}
       {isDetailModalOpen && selectedTeam && (
@@ -357,7 +275,7 @@ const TeamManagement = () => {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 

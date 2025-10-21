@@ -4,7 +4,7 @@ import { authService } from '../services/api';
 const AuthContext = createContext(null);
 
 // Custom hook untuk menggunakan AuthContext
-export const useAuth = () => {
+const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within AuthProvider');
@@ -12,7 +12,7 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -44,21 +44,21 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await authService.login(credentials);
-      const { token, ...userData } = response.data;
-      
+      const { token, account } = response.data;
+
       // Simpan token dan user data
       localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(account));
+
+      setUser(account);
       setIsAuthenticated(true);
-      
-      return { success: true, data: userData };
+
+      return { success: true, data: account };
     } catch (error) {
       console.error('Login error:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Login gagal' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Login gagal'
       };
     }
   };
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is admin
   const isAdmin = () => {
-    return user?.role === 'admin' || user?.isAdmin === true;
+    return user?.type === 'admin';
   };
 
   const value = {
@@ -102,4 +102,6 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
+export { useAuth, AuthProvider };
 export default AuthContext;

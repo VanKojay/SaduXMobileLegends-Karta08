@@ -59,10 +59,10 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }) => {
       if (result.success) {
         toast.success('Login berhasil!', { duration: 3000 });
         onClose();
-        
-        // Redirect based on role dengan delay untuk toast
+
+        // Redirect based on type dengan delay untuk toast
         setTimeout(() => {
-          if (result.data.role === 'admin' || result.data.isAdmin) {
+          if (result.data.type === 'admin') {
             window.location.href = '/admin';
           } else {
             window.location.href = '/dashboard';

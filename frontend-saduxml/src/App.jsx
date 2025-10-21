@@ -6,6 +6,10 @@ import Verify from './pages/Verify';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/admin/Dashboard';
 import TeamManagement from './pages/admin/TeamManagement';
+import StageManagement from './pages/admin/StageManagement';
+import GroupManagement from './pages/admin/GroupManagement';
+import MatchManagement from './pages/admin/MatchManagement';
+import MatchRoundManagement from './pages/admin/MatchRoundManagement';
 import Bracket from './pages/Bracket';
 
 // Protected Route untuk user biasa
@@ -81,6 +85,38 @@ function App() {
             element={
               <AdminRoute>
                 <TeamManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/stages"
+            element={
+              <AdminRoute>
+                <StageManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/groups"
+            element={
+              <AdminRoute>
+                <GroupManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/matches"
+            element={
+              <AdminRoute>
+                <MatchManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/match-rounds"
+            element={
+              <AdminRoute>
+                <MatchRoundManagement />
               </AdminRoute>
             }
           />
