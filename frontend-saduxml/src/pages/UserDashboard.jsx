@@ -156,8 +156,8 @@ const UserDashboard = () => {
         return;
       }
 
-      // Call API (Note: API endpoint might need to be created)
-      // await teamService.updateMember(selectedMember.id, memberForm);
+      // Call API
+      await teamService.updateMember(selectedMember.id, memberForm);
       toast.success('Member berhasil diupdate!', { duration: 3000 });
 
       // Reset form dan close modal

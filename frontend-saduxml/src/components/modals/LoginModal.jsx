@@ -62,9 +62,11 @@ const LoginModal = ({ isOpen, onClose, onSwitchToRegister }) => {
 
         // Redirect based on type dengan delay untuk toast
         setTimeout(() => {
-          if (result.data.type === 'admin') {
+          if (result.data.type === 'super_admin' || result.data.type === 'admin') {
+            // Admin & Super Admin ke halaman admin
             window.location.href = '/admin';
           } else {
+            // Team & Member ke dashboard user
             window.location.href = '/dashboard';
           }
         }, 500);

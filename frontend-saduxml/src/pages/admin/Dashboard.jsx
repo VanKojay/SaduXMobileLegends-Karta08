@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Users, CheckCircle, Clock, Trophy, Layers, Gamepad2, Grid3x3, TrendingUp, Zap } from 'lucide-react';
+import { Users, CheckCircle, Clock, Trophy, Layers, Gamepad2, Grid3x3, TrendingUp, Zap, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import GenerateBracketModal from '../../components/admin/GenerateBracketModal';
 import { adminService, stageService, matchService, groupService } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { isSuperAdmin, user } = useAuth();
   const [stats, setStats] = useState({
     totalTeams: 0,
     pendingTeams: 0,
@@ -323,6 +325,21 @@ const Dashboard = () => {
             <Trophy className="w-8 h-8 text-cyan-400 mb-2" />
             <span className="text-sm font-medium">View Bracket</span>
           </button>
+          {isSuperAdmin() ? (
+            <button
+              onClick={() => navigate('/admin/events')}
+              className="flex flex-col items-center justify-center p-4 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-lg transition-all hover:scale-105"
+            >
+              <Calendar className="w-8 h-8 text-orange-400 mb-2" />
+              <span className="text-sm font-medium">Manage Events</span>
+            </button>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-4 bg-gray-700/30 border border-gray-600/30 rounded-lg">
+              <Calendar className="w-8 h-8 text-gray-500 mb-2" />
+              <span className="text-sm font-medium text-gray-400">My Event</span>
+              <span className="text-xs text-gray-500 mt-1">Event ID: {user?.event_id || 'N/A'}</span>
+            </div>
+          )}
         </div>
       </div>
 

@@ -8,6 +8,7 @@ const BracketConnector = ({
   toX,
   toY,
   isLive = false,
+  isWinnerPath = false,
   className = ''
 }) => {
   // Calculate midpoint for horizontal line
@@ -21,18 +22,34 @@ const BracketConnector = ({
     L ${toX} ${toY}
   `;
 
+  // Determine color based on state
+  let stroke = '#4b5563'; // default gray
+  let strokeWidth = 2;
+  let filter = 'none';
+  let animationClass = '';
+
+  if (isWinnerPath) {
+    stroke = '#10b981'; // green for winner
+    strokeWidth = 3;
+    filter = 'drop-shadow(0 0 6px rgba(16, 185, 129, 0.6))';
+    animationClass = 'animate-pulse';
+  } else if (isLive) {
+    stroke = '#3b82f6'; // blue for live
+    strokeWidth = 3;
+    filter = 'drop-shadow(0 0 4px rgba(59, 130, 246, 0.5))';
+    animationClass = 'animate-pulse';
+  }
+
   return (
     <path
       d={pathD}
       fill="none"
-      stroke={isLive ? '#3b82f6' : '#4b5563'}
-      strokeWidth={isLive ? 3 : 2}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={`transition-all ${className} ${isLive ? 'animate-pulse' : ''}`}
-      style={{
-        filter: isLive ? 'drop-shadow(0 0 4px rgba(59, 130, 246, 0.5))' : 'none'
-      }}
+      className={`transition-all duration-700 ${className} ${animationClass}`}
+      style={{ filter }}
     />
   );
 };
@@ -88,6 +105,12 @@ export const RoundConnector = ({
 
     const isLive = match.status === 'live' || match.status === 'ongoing';
 
+    // Check if this is a winner path (match is finished and winner advanced)
+    const isWinnerPath = match.status === 'finished' && match.winner_id && (
+      nextMatch.team1_id === match.winner_id ||
+      nextMatch.team2_id === match.winner_id
+    );
+
     lines.push(
       <BracketConnector
         key={`connector-${roundIndex}-${matchIndex}`}
@@ -96,6 +119,7 @@ export const RoundConnector = ({
         toX={startX + roundGap}
         toY={toY}
         isLive={isLive}
+        isWinnerPath={isWinnerPath}
       />
     );
   });

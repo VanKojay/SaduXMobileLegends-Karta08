@@ -84,9 +84,25 @@ const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  // Check if user is admin
+  // Role checking functions
+  const isSuperAdmin = () => {
+    return user?.type === 'super_admin';
+  };
+
   const isAdmin = () => {
     return user?.type === 'admin';
+  };
+
+  const isAdminOrSuperAdmin = () => {
+    return user?.type === 'admin' || user?.type === 'super_admin';
+  };
+
+  const isTeam = () => {
+    return user?.type === 'team';
+  };
+
+  const isMember = () => {
+    return user?.type === 'member';
   };
 
   const value = {
@@ -96,7 +112,11 @@ const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    isSuperAdmin,
     isAdmin,
+    isAdminOrSuperAdmin,
+    isTeam,
+    isMember,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

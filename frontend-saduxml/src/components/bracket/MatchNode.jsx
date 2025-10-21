@@ -56,6 +56,12 @@ const MatchNode = ({ match, onClick, isAdmin = false, className = '' }) => {
             <span className="text-xs text-gray-400">
               Match #{match.id || match.matchNumber}
             </span>
+            {/* BO Badge */}
+            {match.best_of && match.best_of > 1 && (
+              <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded text-xs font-bold">
+                BO{match.best_of}
+              </span>
+            )}
           </div>
           {isAdmin && onClick && (
             <Eye className="w-3 h-3 text-gray-500 group-hover:text-indigo-400 transition-colors" />
@@ -123,6 +129,16 @@ const MatchNode = ({ match, onClick, isAdmin = false, className = '' }) => {
         {(match.status === 'live' || match.status === 'ongoing') && (
           <div className="absolute -top-2 -right-2 px-2 py-1 bg-red-500 rounded-full text-xs font-bold text-white shadow-lg animate-pulse">
             LIVE
+          </div>
+        )}
+
+        {/* Winner Advancement Indicator */}
+        {match.status === 'finished' && (isTeam1Winner || isTeam2Winner) && (
+          <div className="absolute -top-2 -right-2 animate-bounce">
+            <div className="relative">
+              <Trophy className="w-6 h-6 text-yellow-400 drop-shadow-lg" />
+              <div className="absolute inset-0 bg-yellow-400 rounded-full blur-md opacity-50 animate-pulse"></div>
+            </div>
           </div>
         )}
       </div>

@@ -177,17 +177,19 @@ export const generateSingleEliminationBracket = (teams, seeding = 'sequential', 
  * @param {number} stageId - Stage ID
  * @param {number} roundNumber - Round number
  * @param {number} groupId - Group ID (optional)
+ * @param {number} bestOf - Best of format (1, 3, 5, 7) - Default: 1
  * @returns {Array} Array of match objects ready for API
  */
-export const createMatchStructure = (pairs, stageId, roundNumber, groupId = null) => {
+export const createMatchStructure = (pairs, stageId, roundNumber, groupId = null, bestOf = 1) => {
   return pairs.map((pair, index) => ({
     team1_id: pair.team1?.id || null,
     team2_id: pair.team2?.id || null,
     stage_id: stageId,
     group_id: groupId,
+    best_of: bestOf, // ⭐ NEW - Best of format
     match_date: new Date().toISOString(),
     status: pair.team2 === null ? 'finished' : 'pending', // Auto-finish if BYE
-    score_team1: pair.team2 === null ? 1 : 0,
+    score_team1: pair.team2 === null ? Math.ceil(bestOf / 2) : 0, // Winner score for BO
     score_team2: 0,
     winner_id: pair.team2 === null ? pair.team1?.id : null,
     round_number: roundNumber,

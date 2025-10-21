@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Trophy, Users, Shuffle, List, ArrowRight, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
+import { X, Trophy, Users, Shuffle, List, ArrowRight, ArrowLeft, CheckCircle, Loader2, Gamepad2 } from 'lucide-react';
 import { adminService, stageService, matchService } from '../../services/api';
 import { generateSingleEliminationBracket, validateBracketConfig, createMatchStructure } from '../../utils/bracketGenerator';
 import toast from 'react-hot-toast';
@@ -18,6 +18,7 @@ const GenerateBracketModal = ({ isOpen, onClose, onSuccess }) => {
   // Step 2: Configuration
   const [bracketType, setBracketType] = useState('single_elimination');
   const [seedingMethod, setSeedingMethod] = useState('sequential');
+  const [bestOf, setBestOf] = useState(3); // Best of 3 as default
 
   // Step 3: Preview
   const [bracketPreview, setBracketPreview] = useState(null);
@@ -121,7 +122,9 @@ const GenerateBracketModal = ({ isOpen, onClose, onSuccess }) => {
             team2: m.team2_id ? { id: m.team2_id, name: m.team2_name } : null,
           })),
           parseInt(selectedStage),
-          round.roundNumber
+          round.roundNumber,
+          null, // groupId
+          bestOf // Pass bestOf parameter
         );
         allMatches.push(...roundMatches);
       }
@@ -147,6 +150,7 @@ const GenerateBracketModal = ({ isOpen, onClose, onSuccess }) => {
     setSelectedTeams([]);
     setBracketType('single_elimination');
     setSeedingMethod('sequential');
+    setBestOf(3); // Reset to BO3 default
     setBracketPreview(null);
     onClose();
   };
@@ -335,6 +339,49 @@ const GenerateBracketModal = ({ isOpen, onClose, onSuccess }) => {
                     </div>
                   </div>
 
+                  {/* Match Format (Best Of) */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-3">
+                      Match Format (Best Of)
+                    </label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {[
+                        { value: 1, label: 'BO1', desc: 'Single Game', wins: 1 },
+                        { value: 3, label: 'BO3', desc: 'First to 2 wins', wins: 2 },
+                        { value: 5, label: 'BO5', desc: 'First to 3 wins', wins: 3 },
+                        { value: 7, label: 'BO7', desc: 'First to 4 wins', wins: 4 },
+                      ].map((format) => (
+                        <label
+                          key={format.value}
+                          className={`flex flex-col items-center space-y-2 p-4 rounded-lg border cursor-pointer transition-all ${
+                            bestOf === format.value
+                              ? 'bg-orange-500/20 border-orange-500/50 ring-2 ring-orange-500/30'
+                              : 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="bestOf"
+                            value={format.value}
+                            checked={bestOf === format.value}
+                            onChange={(e) => setBestOf(parseInt(e.target.value))}
+                            className="w-4 h-4 text-orange-600 bg-gray-700 border-gray-600"
+                          />
+                          <Gamepad2 className={`w-8 h-8 ${bestOf === format.value ? 'text-orange-400' : 'text-gray-400'}`} />
+                          <div className="text-center">
+                            <div className={`font-bold text-lg ${bestOf === format.value ? 'text-orange-400' : 'text-white'}`}>
+                              {format.label}
+                            </div>
+                            <div className="text-xs text-gray-400">{format.desc}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                      💡 BO3 is recommended for tournament matches
+                    </p>
+                  </div>
+
                   {/* Summary */}
                   <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
@@ -351,12 +398,16 @@ const GenerateBracketModal = ({ isOpen, onClose, onSuccess }) => {
                         <span className="ml-2 text-white font-medium">Single Elim</span>
                       </div>
                       <div>
-                        <span className="text-gray-400">Rounds:</span>
-                        <span className="ml-2 text-white font-medium">{Math.ceil(Math.log2(selectedTeams.length))}</span>
+                        <span className="text-gray-400">Format:</span>
+                        <span className="ml-2 text-orange-400 font-bold">BO{bestOf}</span>
                       </div>
                       <div>
                         <span className="text-gray-400">Seeding:</span>
                         <span className="ml-2 text-white font-medium capitalize">{seedingMethod}</span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-gray-400">Rounds:</span>
+                        <span className="ml-2 text-white font-medium">{Math.ceil(Math.log2(selectedTeams.length))}</span>
                       </div>
                     </div>
                   </div>

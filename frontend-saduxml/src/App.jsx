@@ -10,6 +10,7 @@ import StageManagement from './pages/admin/StageManagement';
 import GroupManagement from './pages/admin/GroupManagement';
 import MatchManagement from './pages/admin/MatchManagement';
 import MatchRoundManagement from './pages/admin/MatchRoundManagement';
+import EventManagement from './pages/admin/EventManagement';
 import Bracket from './pages/Bracket';
 import Groups from './pages/user/Groups';
 import Schedule from './pages/user/Schedule';
@@ -34,9 +35,9 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Protected Route untuk admin
+// Protected Route untuk admin & super_admin
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, isAdminOrSuperAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -46,7 +47,26 @@ const AdminRoute = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated || !isAdmin()) {
+  if (!isAuthenticated || !isAdminOrSuperAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// Protected Route untuk super_admin only
+const SuperAdminRoute = ({ children }) => {
+  const { isAuthenticated, isSuperAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !isSuperAdmin()) {
     return <Navigate to="/" replace />;
   }
 
@@ -145,6 +165,14 @@ function App() {
               <AdminRoute>
                 <MatchRoundManagement />
               </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/events"
+            element={
+              <SuperAdminRoute>
+                <EventManagement />
+              </SuperAdminRoute>
             }
           />
 

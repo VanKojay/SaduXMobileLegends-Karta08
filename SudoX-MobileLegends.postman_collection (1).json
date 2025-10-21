@@ -1,0 +1,1153 @@
+{
+	"info": {
+		"_postman_id": "be14d0fa-d2a8-4f86-a8a8-f9ae2b23f595",
+		"name": "SudoX-MobileLegends",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32932322",
+		"_collection_link": "https://www.postman.com/dev-alva/freelance-dwi/collection/fdbkxah/sudox-mobilelegends?action=share&source=collection_link&creator=32932322"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Teams",
+					"item": [
+						{
+							"name": "1. REGISTER",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"DWI ESPORT\",\r\n    \"email\": \"muhamaddwiputranovriansyah@gmail.com\",\r\n    \"password\": \"1234\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/teams/register",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. VERIFY",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/api/teams/verify?token={{vault:json-web-token}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										"verify"
+									],
+									"query": [
+										{
+											"key": "token",
+											"value": "{{vault:json-web-token}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET TEAM INFO",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"dwiputra6@gmail.com\",\r\n    \"name\": \"dwiputra6\",\r\n    \"ml_id\": \"1234510\",\r\n    \"phone\": \"081212121212\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/teams/get-team",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										"get-team"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET MEMBERS",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"dwiputra6@gmail.com\",\r\n    \"name\": \"dwiputra6\",\r\n    \"ml_id\": \"1234510\",\r\n    \"phone\": \"081212121212\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/teams/get-members",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										"get-members"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ADD MEMBER",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"dwiputra6@gmail.com\",\r\n    \"name\": \"dwiputra6\",\r\n    \"ml_id\": \"1234510\",\r\n    \"phone\": \"081212121212\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/teams/members",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										"members"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "EDIT MEMBER",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"dwiputra6@gmail.com\",\r\n    \"name\": \"dwiputra5\",\r\n    \"ml_id\": \"1234510\",\r\n    \"phone\": \"081290909090\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/teams/members/1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										"members",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE MEMBER",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"dwiputra6@gmail.com\",\r\n    \"name\": \"dwiputra6\",\r\n    \"ml_id\": \"1234510\",\r\n    \"phone\": \"081212121212\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/teams/remove-members/?memberId=1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										"remove-members",
+										""
+									],
+									"query": [
+										{
+											"key": "memberId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Groups",
+					"item": [
+						{
+							"name": "LIST GROUP",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/groups/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"groups",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Stages",
+					"item": [
+						{
+							"name": "LIST STAGE",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/stages/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"stages",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Matches",
+					"item": [
+						{
+							"name": "LIST MATCH",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/matches/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"matches",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Match Rounds",
+					"item": [
+						{
+							"name": "LIST MATCH ROUNDS",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/match-rounds/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"match-rounds",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Teams",
+					"item": [
+						{
+							"name": "LIST TEAM",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/teams/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"teams",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Groups",
+					"item": [
+						{
+							"name": "LIST GROUP",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/groups/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"groups",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CREATE GROUP",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"GROUP DWI\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/groups/",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"groups",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Stages",
+					"item": [
+						{
+							"name": "LIST STAGE",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/stages/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"stages",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CREATE STAGE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"FINAL\",\r\n    \"type\": \"final\", // \"group_stage\"/\"knockout\"/\"final\"\r\n    \"order_number\": 3,\r\n    \"status\": \"upcoming\" // \"upcoming\"/\"ongoing\"/\"finished\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/stages/",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"stages",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UPDATE STAGE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"SEMI FINAL\",\r\n    \"type\": \"knockout\", // \"group_stage\"/\"knockout\"/\"final\"\r\n    \"order_number\": 2,\r\n    \"status\": \"upcoming\" // \"upcoming\"/\"ongoing\"/\"finished\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/stages/2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"stages",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE STAGE",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "text"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/stages/2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"stages",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Matches",
+					"item": [
+						{
+							"name": "LIST MATCH",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/matches/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"matches",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CREATE MATCH",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"group_id\": null,\r\n    \"team1_id\": 1, //required\r\n    \"team2_id\": null,\r\n    \"winner_id\": null,\r\n    \"match_date\": \"10-19-2025\", //required\r\n    \"status\": \"pending\", //required: \"pending\"/\"ongoing\"/\"finished\"\r\n    \"score_team1\": null,\r\n    \"score_team2\": null,\r\n    \"stage_id\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/matches/",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"matches",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UPDATE MATCH",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"group_id\": null,\r\n    \"team1_id\": 1, //required\r\n    \"team2_id\": null,\r\n    \"winner_id\": null,\r\n    \"match_date\": \"2025-10-19 21:30:00\", //required\r\n    \"status\": \"pending\", //required: \"pending\"/\"ongoing\"/\"finished\"\r\n    \"score_team1\": null,\r\n    \"score_team2\": null,\r\n    \"stage_id\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/matches/1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"matches",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE MATCH",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "text"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/matches/2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"matches",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Match Rounds",
+					"item": [
+						{
+							"name": "LIST MATCH ROUNDS",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"timdwi@gmail.com\",\r\n    \"password\": \"dwi1234\"\r\n}"
+								},
+								"url": {
+									"raw": "{{URL}}/api/match-rounds/?q=",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"match-rounds",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CREATE MATCH ROUND",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"match_id\": 1,\r\n  \"stage_id\": 1,\r\n  \"round_number\": 2,\r\n  \"score_team1\": 0,\r\n  \"score_team2\": 0,\r\n  \"status\": \"pending\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/match-rounds/",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"match-rounds",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UPDATE MATCH ROUND",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"match_id\": 1,\r\n  \"stage_id\": 1,\r\n  \"round_number\": 1,\r\n  \"score_team1\": 0,\r\n  \"score_team2\": 0,\r\n  \"winner_id\": null,\r\n  \"status\": \"pending\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/match-rounds/1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"match-rounds",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE MATCH",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "text"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/match-rounds/2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"match-rounds",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "1. LOGIN",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.token) {\r",
+							"        pm.environment.set('authToken', jsonData.token);\r",
+							"        pm.test('Token saved to environment variable authToken', function () {\r",
+							"            pm.expect(pm.environment.get('authToken')).to.eql(jsonData.token);\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.test('Response does not contain token property', function () {\r",
+							"            pm.expect(jsonData.token).to.exist;\r",
+							"        });\r",
+							"    }\r",
+							"} else {\r",
+							"    pm.test('Login did not return status 200', function () {\r",
+							"        pm.expect(pm.response.code).to.eql(200);\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// AKUN ADMIN\r\n// {\r\n//     \"email\": \"admin@example.com\",\r\n//     \"password\": \"password123\"\r\n// }\r\n\r\n// AKUN TEAM\r\n{\r\n    \"email\": \"muhamaddwiputranovriansyah@gmail.com\",\r\n    \"password\": \"1234\"\r\n}\r\n\r\n// AKUN MEMBER\r\n// {\r\n//     \"email\": \"dwiputra6@gmail.com\"\r\n// }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/api/auth/login",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

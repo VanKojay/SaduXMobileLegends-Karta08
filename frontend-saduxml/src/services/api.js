@@ -218,4 +218,22 @@ export const bracketService = {
   getFullBracket: (stageId) => api.get(`/brackets/${stageId}`),
 };
 
+// Event Services (Admin) - Real API Implementation
+export const eventService = {
+  // List all events (no search parameter needed, returns all)
+  listEvents: () => api.get('/events/'),
+
+  // Get single event by ID
+  getEvent: (eventId) => api.get(`/events/${eventId}`),
+
+  // Create new event
+  createEvent: (eventData) => api.post('/events/', eventData),
+
+  // Update existing event
+  updateEvent: (eventId, eventData) => api.put(`/events/${eventId}`, eventData),
+
+  // Delete event
+  deleteEvent: (eventId) => api.delete(`/events/${eventId}`),
+};
+
 export default api;

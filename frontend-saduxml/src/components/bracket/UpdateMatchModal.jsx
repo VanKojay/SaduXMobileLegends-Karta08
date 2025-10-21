@@ -29,10 +29,23 @@ const UpdateMatchModal = ({ isOpen, onClose, match, onUpdate }) => {
     try {
       setIsSubmitting(true);
 
+      // Get max wins needed based on BO format
+      const bestOf = match.best_of || 1;
+      const maxWins = Math.ceil(bestOf / 2);
+
       // Validate scores
       if (formData.status === 'finished' && formData.score_team1 === formData.score_team2) {
         toast.error('Score tidak boleh sama untuk match yang sudah selesai');
         return;
+      }
+
+      // Validate BO format winner requirement
+      if (formData.status === 'finished') {
+        const maxScore = Math.max(formData.score_team1, formData.score_team2);
+        if (maxScore < maxWins) {
+          toast.error(`Match BO${bestOf} membutuhkan minimal ${maxWins} kemenangan`);
+          return;
+        }
       }
 
       // Auto-determine winner if finished
@@ -75,16 +88,26 @@ const UpdateMatchModal = ({ isOpen, onClose, match, onUpdate }) => {
 
   const incrementScore = (team, amount) => {
     const field = team === 1 ? 'score_team1' : 'score_team2';
-    setFormData(prev => ({
-      ...prev,
-      [field]: Math.max(0, prev[field] + amount)
-    }));
+    const bestOf = match.best_of || 1;
+    const maxWins = Math.ceil(bestOf / 2);
+
+    setFormData(prev => {
+      const newValue = prev[field] + amount;
+      // Clamp between 0 and maxWins
+      return {
+        ...prev,
+        [field]: Math.max(0, Math.min(maxWins, newValue))
+      };
+    });
   };
 
   if (!isOpen || !match) return null;
 
   const team1Name = match.team1?.name || match.team1_name || `Team #${match.team1_id}`;
   const team2Name = match.team2?.name || match.team2_name || `Team #${match.team2_id}`;
+
+  const bestOf = match.best_of || 1;
+  const maxWins = Math.ceil(bestOf / 2);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
@@ -96,7 +119,18 @@ const UpdateMatchModal = ({ isOpen, onClose, match, onUpdate }) => {
               <Trophy className="w-5 h-5 text-yellow-400" />
               <span>Update Match</span>
             </h2>
-            <p className="text-sm text-gray-400 mt-1">Match #{match.id}</p>
+            <div className="flex items-center space-x-2 mt-1">
+              <p className="text-sm text-gray-400">Match #{match.id}</p>
+              {match.best_of && match.best_of > 1 && (
+                <>
+                  <span className="text-gray-600">•</span>
+                  <span className="text-xs px-2 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded font-bold">
+                    BO{match.best_of}
+                  </span>
+                  <span className="text-xs text-gray-500">(First to {Math.ceil(match.best_of / 2)} wins)</span>
+                </>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -160,8 +194,12 @@ const UpdateMatchModal = ({ isOpen, onClose, match, onUpdate }) => {
                 <input
                   type="number"
                   min="0"
+                  max={maxWins}
                   value={formData.score_team1}
-                  onChange={(e) => setFormData(prev => ({ ...prev, score_team1: parseInt(e.target.value) || 0 }))}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 0;
+                    setFormData(prev => ({ ...prev, score_team1: Math.min(maxWins, Math.max(0, val)) }));
+                  }}
                   className="flex-1 text-center px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white text-2xl font-bold focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
                 <button
@@ -193,8 +231,12 @@ const UpdateMatchModal = ({ isOpen, onClose, match, onUpdate }) => {
                 <input
                   type="number"
                   min="0"
+                  max={maxWins}
                   value={formData.score_team2}
-                  onChange={(e) => setFormData(prev => ({ ...prev, score_team2: parseInt(e.target.value) || 0 }))}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 0;
+                    setFormData(prev => ({ ...prev, score_team2: Math.min(maxWins, Math.max(0, val)) }));
+                  }}
                   className="flex-1 text-center px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white text-2xl font-bold focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
                 <button
@@ -207,6 +249,21 @@ const UpdateMatchModal = ({ isOpen, onClose, match, onUpdate }) => {
               </div>
             </div>
           </div>
+
+          {/* BO Format Helper */}
+          {match.best_of && match.best_of > 1 && (
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-400">
+                <span className="font-bold text-orange-400">BO{match.best_of}</span> Series Format
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                First team to win <span className="font-bold text-white">{Math.ceil(match.best_of / 2)}</span> game(s) wins the match
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                Max score per team: {Math.ceil(match.best_of / 2)}
+              </p>
+            </div>
+          )}
 
           {/* Winner Preview */}
           {formData.status === 'finished' && (

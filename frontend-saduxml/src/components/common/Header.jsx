@@ -7,7 +7,7 @@ const Header = ({ onLoginClick, onRegisterClick }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [scrollProgress, setScrollProgress] = useState(0);
-  const { isAuthenticated, user, logout, isAdmin } = useAuth();
+  const { isAuthenticated, user, logout, isAdminOrSuperAdmin } = useAuth();
   const mobileMenuRef = useRef(null);
 
   // Deteksi scroll untuk efek backdrop blur & progress bar
@@ -174,7 +174,7 @@ const Header = ({ onLoginClick, onRegisterClick }) => {
             <div className="hidden lg:flex items-center space-x-2">
               {isAuthenticated ? (
                 <>
-                  {isAdmin() ? (
+                  {isAdminOrSuperAdmin() ? (
                     <a
                       href="/admin"
                       className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 rounded-lg text-sm font-bold shadow-lg shadow-yellow-500/30 transition-all hover:scale-105"
@@ -327,7 +327,7 @@ const Header = ({ onLoginClick, onRegisterClick }) => {
                 {isAuthenticated ? (
                   <>
                     <div className="flex items-center space-x-3 px-4 py-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                      {isAdmin() ? (
+                      {isAdminOrSuperAdmin() ? (
                         <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
                           <Shield className="w-5 h-5 text-white" />
                         </div>
@@ -338,11 +338,11 @@ const Header = ({ onLoginClick, onRegisterClick }) => {
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-white truncate">{user?.name || user?.email}</p>
-                        <p className="text-xs text-gray-400">{isAdmin() ? 'Administrator' : 'Team Member'}</p>
+                        <p className="text-xs text-gray-400">{isAdminOrSuperAdmin() ? 'Administrator' : 'Team Member'}</p>
                       </div>
                     </div>
 
-                    {isAdmin() ? (
+                    {isAdminOrSuperAdmin() ? (
                       <a
                         href="/admin"
                         className="block w-full px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 rounded-lg text-center font-bold shadow-lg shadow-yellow-500/30 transition-all"

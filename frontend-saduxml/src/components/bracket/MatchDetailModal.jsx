@@ -1,4 +1,4 @@
-import { X, Trophy, Calendar, Clock, Users, Award } from 'lucide-react';
+import { X, Trophy, Calendar, Clock, Users, Award, Gamepad2 } from 'lucide-react';
 
 const MatchDetailModal = ({ isOpen, onClose, match }) => {
   if (!isOpen || !match) return null;
@@ -60,7 +60,17 @@ const MatchDetailModal = ({ isOpen, onClose, match }) => {
             </div>
             <div>
               <h2 className="text-xl font-bold">Match Details</h2>
-              <p className="text-sm text-gray-400">Match #{match.id}</p>
+              <div className="flex items-center space-x-2 mt-1">
+                <p className="text-sm text-gray-400">Match #{match.id}</p>
+                {match.best_of && match.best_of > 1 && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className="text-xs px-2 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded font-bold">
+                      BO{match.best_of}
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -153,6 +163,22 @@ const MatchDetailModal = ({ isOpen, onClose, match }) => {
               </div>
             </div>
           </div>
+
+          {/* BO Format Info (if applicable) */}
+          {match.best_of && match.best_of > 1 && (
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Gamepad2 className="w-5 h-5 text-orange-400" />
+                <span className="text-sm font-bold text-orange-400">Series Format</span>
+              </div>
+              <div className="text-white font-semibold mb-1">
+                Best of {match.best_of} (BO{match.best_of})
+              </div>
+              <div className="text-sm text-gray-400">
+                First team to win <span className="font-bold text-white">{Math.ceil(match.best_of / 2)}</span> game(s) wins the match
+              </div>
+            </div>
+          )}
 
           {/* Additional Info */}
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-800">

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Menu, X, Trophy, Users, Layers, Gamepad2, Grid3x3, GitBranch } from 'lucide-react';
+import { LogOut, Menu, X, Trophy, Users, Layers, Gamepad2, Grid3x3, GitBranch, Calendar } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminLayout = ({ children, title, subtitle }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, isSuperAdmin } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleLogout = () => {
@@ -21,6 +21,8 @@ const AdminLayout = ({ children, title, subtitle }) => {
     { path: '/admin/groups', icon: Grid3x3, label: 'Groups' },
     { path: '/admin/matches', icon: Gamepad2, label: 'Matches' },
     { path: '/admin/match-rounds', icon: GitBranch, label: 'Match Rounds' },
+    // Conditional: Only show Events for Super Admin
+    ...(isSuperAdmin() ? [{ path: '/admin/events', icon: Calendar, label: 'Events' }] : []),
     { path: '/bracket', icon: Trophy, label: 'Bracket' },
   ];
 

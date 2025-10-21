@@ -133,7 +133,9 @@ const BracketTree = ({
                     return (
                       <div
                         key={match.id || `match-${roundIndex}-${matchIndex}`}
-                        className="absolute transition-all duration-300 hover:z-10"
+                        className={`absolute transition-all duration-500 hover:z-10 ${
+                          match.status === 'finished' ? 'animate-match-complete' : ''
+                        }`}
                         style={{
                           top: yPos,
                           left: 0
