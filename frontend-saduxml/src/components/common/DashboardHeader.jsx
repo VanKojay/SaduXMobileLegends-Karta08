@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User, Shield, Trophy, Home, ChevronRight } from 'lucide-react';
+import { Menu, X, LogOut, User, Shield, Trophy, Home, ChevronRight, Grid3x3, Calendar, Gamepad2, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const DashboardHeader = ({ title = 'Dashboard' }) => {
@@ -91,6 +91,40 @@ const DashboardHeader = ({ title = 'Dashboard' }) => {
 
             {/* Desktop Actions - Clean & Simple */}
             <div className="hidden lg:flex items-center space-x-2">
+              {/* Navigation Links for User */}
+              {!isAdmin() && (
+                <>
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-400 hover:text-cyan-400 hover:bg-gray-800/50 rounded-lg text-sm font-medium transition-all"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/my-matches')}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-400 hover:text-cyan-400 hover:bg-gray-800/50 rounded-lg text-sm font-medium transition-all"
+                  >
+                    <Gamepad2 className="w-4 h-4" />
+                    <span>My Matches</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/schedule')}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-400 hover:text-cyan-400 hover:bg-gray-800/50 rounded-lg text-sm font-medium transition-all"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Schedule</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/groups')}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-400 hover:text-cyan-400 hover:bg-gray-800/50 rounded-lg text-sm font-medium transition-all"
+                  >
+                    <Grid3x3 className="w-4 h-4" />
+                    <span>Groups</span>
+                  </button>
+                </>
+              )}
+
               {/* View Bracket Button */}
               <button
                 onClick={handleNavigateBracket}
@@ -174,11 +208,54 @@ const DashboardHeader = ({ title = 'Dashboard' }) => {
                     <span className="font-semibold">Kembali ke Home</span>
                   </button>
 
-                  {/* Dashboard - Current Page */}
-                  <div className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-                    <User className="w-5 h-5" />
-                    <span className="font-semibold">{title}</span>
-                  </div>
+                  {/* User Navigation */}
+                  {!isAdmin() && (
+                    <>
+                      <button
+                        onClick={() => {
+                          navigate('/dashboard');
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all"
+                      >
+                        <LayoutDashboard className="w-5 h-5" />
+                        <span className="font-semibold">My Dashboard</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate('/my-matches');
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all"
+                      >
+                        <Gamepad2 className="w-5 h-5" />
+                        <span className="font-semibold">My Matches</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate('/schedule');
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all"
+                      >
+                        <Calendar className="w-5 h-5" />
+                        <span className="font-semibold">Schedule</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate('/groups');
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all"
+                      >
+                        <Grid3x3 className="w-5 h-5" />
+                        <span className="font-semibold">Groups</span>
+                      </button>
+                    </>
+                  )}
 
                   {/* Live Bracket */}
                   <button

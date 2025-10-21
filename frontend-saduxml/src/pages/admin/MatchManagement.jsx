@@ -34,46 +34,7 @@ const MatchManagement = () => {
 
   const [formErrors, setFormErrors] = useState({});
 
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
-
-  useEffect(() => {
-    filterMatchesData();
-  }, [filterMatchesData]);
-
-  const fetchInitialData = async () => {
-    try {
-      setIsLoading(true);
-      const [matchesRes, teamsRes, stagesRes, groupsRes] = await Promise.all([
-        matchService.listMatches(),
-        adminService.teams.list(),
-        stageService.listStages(),
-        groupService.listGroups(),
-      ]);
-
-      setMatches(matchesRes.data || []);
-      setTeams(teamsRes.data || []);
-      setStages(stagesRes.data || []);
-      setGroups(groupsRes.data || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Gagal memuat data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchMatches = async () => {
-    try {
-      const response = await matchService.listMatches();
-      setMatches(response.data || []);
-    } catch (error) {
-      console.error('Error fetching matches:', error);
-      toast.error('Gagal memuat data matches');
-    }
-  };
-
+  // Define helper functions BEFORE useEffect that uses them
   const getTeamName = useCallback((teamId) => {
     if (!teamId) return 'TBD';
     const team = teams.find((t) => t.id === teamId);
@@ -108,6 +69,46 @@ const MatchManagement = () => {
 
     setFilteredMatches(filtered);
   }, [matches, searchQuery, filterStatus, filterStage, getTeamName]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    filterMatchesData();
+  }, [matches, searchQuery, filterStatus, filterStage, getTeamName, filterMatchesData]);
+
+  const fetchInitialData = async () => {
+    try {
+      setIsLoading(true);
+      const [matchesRes, teamsRes, stagesRes, groupsRes] = await Promise.all([
+        matchService.listMatches(),
+        adminService.teams.list(),
+        stageService.listStages(),
+        groupService.listGroups(),
+      ]);
+
+      setMatches(matchesRes.data || []);
+      setTeams(teamsRes.data || []);
+      setStages(stagesRes.data || []);
+      setGroups(groupsRes.data || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Gagal memuat data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchMatches = async () => {
+    try {
+      const response = await matchService.listMatches();
+      setMatches(response.data || []);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      toast.error('Gagal memuat data matches');
+    }
+  };
 
   const getStageName = (stageId) => {
     if (!stageId) return '-';

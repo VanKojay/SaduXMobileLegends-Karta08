@@ -21,13 +21,27 @@ const GroupManagement = () => {
 
   const [formErrors, setFormErrors] = useState({});
 
+  // Define filterGroupsData BEFORE useEffect that uses it
+  const filterGroupsData = useCallback(() => {
+    let filtered = [...groups];
+
+    // Search
+    if (searchQuery) {
+      filtered = filtered.filter((group) =>
+        group.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredGroups(filtered);
+  }, [groups, searchQuery]);
+
   useEffect(() => {
     fetchGroups();
   }, []);
 
   useEffect(() => {
     filterGroupsData();
-  }, [filterGroupsData]);
+  }, [groups, searchQuery, filterGroupsData]);
 
   const fetchGroups = async () => {
     try {
@@ -41,19 +55,6 @@ const GroupManagement = () => {
       setIsLoading(false);
     }
   };
-
-  const filterGroupsData = useCallback(() => {
-    let filtered = [...groups];
-
-    // Search
-    if (searchQuery) {
-      filtered = filtered.filter((group) =>
-        group.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setFilteredGroups(filtered);
-  }, [groups, searchQuery]);
 
   const handleOpenModal = (group = null) => {
     if (group) {

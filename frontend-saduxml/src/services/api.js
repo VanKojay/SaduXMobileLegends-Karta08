@@ -183,6 +183,10 @@ export const adminService = {
   teams: {
     // List all teams
     list: (query = '') => api.get(`/teams/?q=${query}`),
+    // Update team
+    update: (teamId, teamData) => api.put(`/teams/${teamId}`, teamData),
+    // Delete team
+    delete: (teamId) => api.delete(`/teams/${teamId}`),
   },
 
   // Approve team - Update status to approved

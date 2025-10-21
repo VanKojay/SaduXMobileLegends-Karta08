@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Users, Search, Filter, CheckCircle, XCircle, X, Eye } from 'lucide-react';
+import { Users, Search, Filter, CheckCircle, XCircle, X, Eye, Edit, Trash2, Mail, User, AlertCircle } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService } from '../../services/api';
 import toast from 'react-hot-toast';
@@ -12,6 +12,10 @@ const TeamManagement = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({ name: '', email: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchTeams();
@@ -19,7 +23,8 @@ const TeamManagement = () => {
 
   useEffect(() => {
     filterTeams();
-  }, [filterTeams]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teams, searchQuery, filterStatus]);
 
   const fetchTeams = async () => {
     try {
@@ -81,6 +86,53 @@ const TeamManagement = () => {
   const handleViewDetail = (team) => {
     setSelectedTeam(team);
     setIsDetailModalOpen(true);
+  };
+
+  const handleOpenEdit = (team) => {
+    setSelectedTeam(team);
+    setEditFormData({ name: team.name, email: team.email });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTeam = async (e) => {
+    e.preventDefault();
+    if (!editFormData.name || !editFormData.email) {
+      toast.error('Semua field wajib diisi');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await adminService.teams.update(selectedTeam.id, editFormData);
+      toast.success('Team berhasil diupdate');
+      setIsEditModalOpen(false);
+      fetchTeams();
+    } catch (error) {
+      console.error('Error updating team:', error);
+      toast.error(error.response?.data?.message || 'Gagal update team');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenDelete = (team) => {
+    setSelectedTeam(team);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteTeam = async () => {
+    try {
+      setIsSubmitting(true);
+      await adminService.teams.delete(selectedTeam.id);
+      toast.success('Team berhasil dihapus');
+      setIsDeleteModalOpen(false);
+      fetchTeams();
+    } catch (error) {
+      console.error('Error deleting team:', error);
+      toast.error(error.response?.data?.message || 'Gagal hapus team');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const statusColors = {
@@ -179,6 +231,20 @@ const TeamManagement = () => {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
+                          <button
+                            onClick={() => handleOpenEdit(team)}
+                            className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg transition-colors"
+                            title="Edit Team"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenDelete(team)}
+                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
+                            title="Delete Team"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                           {team.status === 'pending' && (
                             <>
                               <button
@@ -190,7 +256,7 @@ const TeamManagement = () => {
                               </button>
                               <button
                                 onClick={() => handleReject(team.id)}
-                                className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
+                                className="p-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 rounded-lg transition-colors"
                                 title="Reject"
                               >
                                 <XCircle className="w-4 h-4" />
@@ -272,6 +338,125 @@ const TeamManagement = () => {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {isEditModalOpen && selectedTeam && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg border border-gray-800">
+            <div className="flex justify-between items-center p-6 border-b border-gray-800">
+              <h2 className="text-2xl font-bold">Edit Team</h2>
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateTeam} className="p-6 space-y-4">
+              {/* Team Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Team Name</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={editFormData.name}
+                    onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Nama team"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    value={editFormData.email}
+                    onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="team@example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors"
+                  disabled={isSubmitting}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {isDeleteModalOpen && selectedTeam && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-800">
+            <div className="flex justify-between items-center p-6 border-b border-gray-800">
+              <h2 className="text-2xl font-bold">Hapus Team</h2>
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="flex items-center space-x-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg mb-6">
+                <AlertCircle className="w-6 h-6 text-red-400 flex-shrink-0" />
+                <div>
+                  <p className="text-red-400 font-medium">Peringatan!</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Data team yang dihapus tidak dapat dikembalikan.
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-gray-300 mb-2">Apakah Anda yakin ingin menghapus team:</p>
+              <p className="text-xl font-bold mb-6">{selectedTeam.name}</p>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors"
+                  disabled={isSubmitting}
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleDeleteTeam}
+                  className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Menghapus...' : 'Hapus'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

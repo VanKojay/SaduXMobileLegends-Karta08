@@ -11,6 +11,9 @@ import GroupManagement from './pages/admin/GroupManagement';
 import MatchManagement from './pages/admin/MatchManagement';
 import MatchRoundManagement from './pages/admin/MatchRoundManagement';
 import Bracket from './pages/Bracket';
+import Groups from './pages/user/Groups';
+import Schedule from './pages/user/Schedule';
+import MyMatches from './pages/user/MyMatches';
 
 // Protected Route untuk user biasa
 const ProtectedRoute = ({ children }) => {
@@ -67,6 +70,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/groups"
+            element={
+              <ProtectedRoute>
+                <Groups />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schedule"
+            element={
+              <ProtectedRoute>
+                <Schedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-matches"
+            element={
+              <ProtectedRoute>
+                <MyMatches />
               </ProtectedRoute>
             }
           />

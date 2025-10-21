@@ -26,27 +26,7 @@ const StageManagement = () => {
 
   const [formErrors, setFormErrors] = useState({});
 
-  useEffect(() => {
-    fetchStages();
-  }, []);
-
-  useEffect(() => {
-    filterStagesData();
-  }, [filterStagesData]);
-
-  const fetchStages = async () => {
-    try {
-      setIsLoading(true);
-      const response = await stageService.listStages();
-      setStages(response.data || []);
-    } catch (error) {
-      console.error('Error fetching stages:', error);
-      toast.error('Gagal memuat data stages');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Define filterStagesData BEFORE useEffect that uses it
   const filterStagesData = useCallback(() => {
     let filtered = [...stages];
 
@@ -72,6 +52,27 @@ const StageManagement = () => {
 
     setFilteredStages(filtered);
   }, [stages, searchQuery, filterStatus, filterType]);
+
+  useEffect(() => {
+    fetchStages();
+  }, []);
+
+  useEffect(() => {
+    filterStagesData();
+  }, [stages, searchQuery, filterStatus, filterType, filterStagesData]);
+
+  const fetchStages = async () => {
+    try {
+      setIsLoading(true);
+      const response = await stageService.listStages();
+      setStages(response.data || []);
+    } catch (error) {
+      console.error('Error fetching stages:', error);
+      toast.error('Gagal memuat data stages');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleOpenModal = (stage = null) => {
     if (stage) {
