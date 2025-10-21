@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Team, Member } from "../db.js";
+import { Team, Member, Event } from "../db.js";
 import { sendVerificationEmail } from "../utils/email.js";
 import { Op } from "sequelize";
 
@@ -8,66 +8,119 @@ const JWT_SECRET = process.env.JWT_SECRET || "shhhhh";
 
 export const registerTeam = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!email || !password || !name) return res.status(400).json({ message: "Missing fields" });
+    const { name, email, password, event_id } = req.body;
+    if (!email || !password || !name || !event_id)
+      return res.status(400).json({ message: "Missing fields" });
 
-    const checkEmail = await Team.findOne({
-      email: email
-    });
-    console.log(checkEmail);
-    if (checkEmail) {
-      return res.status(500).json({
-        message: "Email already use"
-      })
+    // Ambil info event untuk validasi
+    const event = await Event.findByPk(event_id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    // Validasi max_teams
+    const teamCount = await Team.count({ where: { event_id } });
+    if (teamCount >= event.max_teams) {
+      return res.status(400).json({ message: `Team registration full. Max teams: ${event.max_teams}` });
     }
-    
+
+    // Validasi registration_deadline
+    if (event.registration_deadline && new Date() > new Date(event.registration_deadline)) {
+      return res.status(400).json({ message: "Registration deadline has passed" });
+    }
+
+    // Cek email sudah terdaftar
+    const checkEmail = await Team.findOne({ where: { email } });
+    if (checkEmail) {
+      return res.status(409).json({ message: "Email already used" });
+    }
+
+    // Generate token verifikasi
     const verifyToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
     const verifyExpires = new Date(Date.now() + 60 * 60 * 1000);
 
-    const team = await Team.create({ name, email, password: password, verify_token: verifyToken, verify_expires: verifyExpires, verified: false });
-    sendVerificationEmail(email, verifyToken).catch((e) => console.error("Email error", e));
-    return res.status(201).json({ message: "Team registered. Check email to verify.", verificationToken: verifyToken });
+    // Buat team baru
+    const team = await Team.create({
+      name,
+      email,
+      password,
+      verify_token: verifyToken,
+      verify_expires: verifyExpires,
+      verified: false,
+      event_id
+    });
+
+    // Kirim email verifikasi (async)
+    sendVerificationEmail(email, verifyToken).catch(e => console.error("Email error", e));
+
+    return res.status(201).json({
+      message: "Team registered. Check email to verify.",
+      verificationToken: verifyToken
+    });
+
   } catch (err) {
-    if (err.name === "SequelizeUniqueConstraintError") return res.status(409).json({ message: "Email already registered" });
+    if (err.name === "SequelizeUniqueConstraintError")
+      return res.status(409).json({ message: "Email already registered" });
+
     console.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const listTeams = (req, res) => {
+
+export const listTeams = async (req, res) => {
   const keyword = req.query.q || ''; // contoh: ?q=dwi
 
-  Team.findAll({
-    include: [
-      {
-        model: Member,
-        attributes: ["id", "name"], // ambil kolom tertentu
-      },
-    ],
-    where: {
-      [Op.or]: [
-        { name: { [Op.like]: `%${keyword}%` } },
-        { email: { [Op.like]: `%${keyword}%` } },
+  try {
+    const teams = await Team.findAll({
+      include: [
+        {
+          model: Member,
+          attributes: ["id", "name"], // ambil kolom tertentu
+        },
       ],
-    },
-  })
-    .then((list) => res.json(list))
-    .catch(() => res.status(500).json({ message: "Internal Server Error" }));
+      where: {
+        [Op.or]: [
+          { event_id: req.user.event_id },
+          { name: { [Op.like]: `%${keyword}%` } },
+          { email: { [Op.like]: `%${keyword}%` } },
+        ],
+      },
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({
+      message: "Internal Server Error"
+    })
+  }
 };
 
 export const listMembers = async (req, res) => {
   const keyword = req.query.q || ''; // contoh: ?q=dwi
 
   try {
-    const members = await Member.findAll({
-      where: {
-        [Op.or]: [
-          { team_id: req.user.id },
-          { name: { [Op.like]: `%${keyword}%` } },
-          { email: { [Op.like]: `%${keyword}%` } },
-        ],
-      },
-    })
+    let members = []
+    if (req.user.type !== "super_admin") {
+      members = await Member.findAll({
+        where: {
+          event_id: req.user.event_id, // wajib sama dengan event user
+          [Op.or]: [
+            { team_id: req.user.id }, // kalau mau tetap filter team
+            { name: { [Op.like]: `%${keyword}%` } },
+            { email: { [Op.like]: `%${keyword}%` } },
+          ],
+        },
+      });
+    } else {
+      members = await Member.findAll({
+        where: {
+          [Op.or]: [
+            { name: { [Op.like]: `%${keyword}%` } },
+            { email: { [Op.like]: `%${keyword}%` } },
+          ],
+        },
+        order: [['event_id', 'DESC']], // sorting by event_id ascending
+      });
+    }
+
     res.json(members);
   } catch (err) {
     console.error(err);
@@ -142,12 +195,13 @@ export const loginTeam = async (req, res) => {
 export const addMember = async (req, res) => {
   try {
     const teamId = req.user && req.user.id;
+    const eventId = req.user ? req?.user.event_id : req?.body?.event_id;
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
     const { ml_id, name, email, phone } = req.body;
     if (!ml_id || !name) return res.status(400).json({ message: "Missing fields" });
     const count = await Member.count({ where: { team_id: teamId } });
     if (count >= 5) return res.status(400).json({ message: "Team member limit reached (5)" });
-    const member = await Member.create({ team_id: teamId, ml_id, name, email, phone });
+    const member = await Member.create({ team_id: teamId, event_id: eventId, ml_id, name, email, phone });
     return res.status(201).json(member);
   } catch (err) {
     console.error(err);

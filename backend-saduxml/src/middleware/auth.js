@@ -11,9 +11,9 @@ export const authMiddleware = (req, res, next) => {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     if (payload.type === "member") {
-      req.user = { id: payload.id, id_member: payload.id_member, email_member: payload.email_member, type: payload.type };
+      req.user = { id: payload.id, id_member: payload.id_member, email_member: payload.email_member, type: payload.type, event_id: payload.event_id };
     } else {
-      req.user = { id: payload.id, email: payload.email, type: payload.type };
+      req.user = { id: payload.id, email: payload.email, type: payload.type, event_id: payload.event_id };
     }
     next();
   } catch (e) {
@@ -28,5 +28,10 @@ export const isNotMemberAllowedMiddleware = (req, res, next) => {
 
 export const isAdminAllowedMiddleware = (req, res, next) => {
   if (req.user.type !== "admin") return res.status(403).json({ message: "Forbidden" });
+  next();
+}
+
+export const isSuperAdminAllowedMiddleware = (req, res, next) => {
+  if (req.user.type !== "super_admin") return res.status(403).json({ message: "Forbidden" });
   next();
 }

@@ -1,34 +1,43 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
-export async function up(queryInterface, Sequelize) {
-  // Ambil salah satu tim
-  const teams = await queryInterface.sequelize.query(
-    `SELECT id FROM teams LIMIT 1;`
-  );
-  const teamId = teams[0][0]?.id || 1;
+export default {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.bulkInsert('matches', [
+      // ⚔️ Event 1 - Group Stage
+      {
+        event_id: 1,
+        stage_id: 1, // Group Stage
+        group_id: 1,
+        team1_id: 1,
+        team2_id: 2,
+        round: 'Group A - Match 1',
+        match_date: new Date('2025-11-01T14:00:00Z'),
+        score_team1: null,
+        score_team2: null,
+        winner_id: null,
+        status: 'pending',
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        event_id: 1,
+        stage_id: 1,
+        group_id: 1,
+        team1_id: 3,
+        team2_id: 4,
+        round: 'Group A - Match 2',
+        match_date: new Date('2025-11-01T15:00:00Z'),
+        score_team1: null,
+        score_team2: null,
+        winner_id: null,
+        status: 'pending',
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+    ]);
+  },
 
-  // Ambil salah satu grup (escape karena "groups" keyword SQL)
-  const groups = await queryInterface.sequelize.query(
-    `SELECT id FROM \`groups\` LIMIT 1;`
-  );
-  const groupId = groups[0][0]?.id || 1;
-
-  // Insert dummy match
-  await queryInterface.bulkInsert('matches', [
-    {
-      group_id: groupId,
-      team1_id: teamId,
-      team2_id: teamId, // sementara dummy
-      match_date: new Date(),
-      status: 'pending',
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-  ]);
-}
-
-/** @type {import('sequelize-cli').Migration} */
-export async function down(queryInterface, Sequelize) {
-  await queryInterface.bulkDelete('matches', null, {});
-}
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('matches', null, {});
+  },
+};

@@ -8,18 +8,33 @@ export default {
         primaryKey: true,
         autoIncrement: true,
       },
+
       name: {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
-      created_at: {
+
+      event_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'events',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+        comment: 'Relasi ke event tempat grup ini berada',
+      },
+
+      created_at: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
+
       updated_at: {
-        allowNull: false,
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
       },
     });

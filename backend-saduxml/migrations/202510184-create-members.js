@@ -2,13 +2,14 @@
 
 export default {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('stages', {
+    await queryInterface.createTable('members', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
 
+      // 🔹 Relasi ke event
       event_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -18,38 +19,47 @@ export default {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
-        comment: 'Relasi ke event tempat stage ini berada',
+        comment: 'Relasi ke event tempat member ini bertanding',
       },
 
-      best_of: {
+      // 🔹 Relasi ke team
+      team_id: {
         type: Sequelize.INTEGER,
-        defaultValue: 3,
+        allowNull: false,
+        references: {
+          model: 'teams',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+        comment: 'Relasi ke team tempat member ini tergabung',
       },
-      
+
+      // 🔹 Data pemain
+      ml_id: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+        unique: true,
+        comment: 'ID Mobile Legends player',
+      },
+
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(191),
         allowNull: false,
-        comment: 'Nama babak: Penyisihan, Semifinal, Final, dll',
       },
 
-      type: {
-        type: Sequelize.ENUM('group_stage', 'knockout', 'final'),
-        allowNull: false,
-        defaultValue: 'knockout',
+      email: {
+        type: Sequelize.STRING(191),
+        allowNull: true,
+        unique: true,
       },
 
-      order_number: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        comment: 'Urutan stage dalam event',
+      phone: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
       },
 
-      status: {
-        type: Sequelize.ENUM('upcoming', 'ongoing', 'finished'),
-        allowNull: false,
-        defaultValue: 'upcoming',
-      },
-
+      // 🔹 Timestamp
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -65,6 +75,6 @@ export default {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('stages');
+    await queryInterface.dropTable('members');
   },
 };

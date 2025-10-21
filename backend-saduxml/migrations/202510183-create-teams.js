@@ -2,13 +2,14 @@
 
 export default {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('stages', {
+    await queryInterface.createTable('teams', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
 
+      // 🔹 Relasi ke event
       event_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -18,36 +19,39 @@ export default {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
-        comment: 'Relasi ke event tempat stage ini berada',
+        comment: 'Relasi ke event yang diikuti tim ini',
       },
 
-      best_of: {
-        type: Sequelize.INTEGER,
-        defaultValue: 3,
-      },
-      
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(191),
         allowNull: false,
-        comment: 'Nama babak: Penyisihan, Semifinal, Final, dll',
       },
 
-      type: {
-        type: Sequelize.ENUM('group_stage', 'knockout', 'final'),
+      email: {
+        type: Sequelize.STRING(191),
         allowNull: false,
-        defaultValue: 'knockout',
+        unique: true,
       },
 
-      order_number: {
-        type: Sequelize.INTEGER,
+      password: {
+        type: Sequelize.STRING(255),
         allowNull: false,
-        comment: 'Urutan stage dalam event',
+        comment: 'Password yang sudah di-hash',
       },
 
-      status: {
-        type: Sequelize.ENUM('upcoming', 'ongoing', 'finished'),
-        allowNull: false,
-        defaultValue: 'upcoming',
+      verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+
+      verify_token: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+
+      verify_expires: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
 
       created_at: {
@@ -65,6 +69,6 @@ export default {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('stages');
+    await queryInterface.dropTable('teams');
   },
 };

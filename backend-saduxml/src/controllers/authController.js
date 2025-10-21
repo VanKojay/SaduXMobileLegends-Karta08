@@ -22,7 +22,7 @@ export const login = async (req, res) => {
       }
 
       const token = jwt.sign(
-        { id: user.id, email, type: "admin" },
+        { id: user.id, email, event_id: user.event_id, type: user.role },
         JWT_SECRET,
         { expiresIn: "7d" }
       );
@@ -34,7 +34,8 @@ export const login = async (req, res) => {
           id: user.id,
           name: user.name,
           email: user.email,
-          type: "admin"
+          event_id: user.event_id,
+          type: user.role
         },
       });
     }
@@ -52,7 +53,7 @@ export const login = async (req, res) => {
       }
 
       const token = jwt.sign(
-        { id: team.id, email, type: "team" },
+        { id: team.id, event_id: team.event_id, email, type: "team" },
         JWT_SECRET,
         { expiresIn: "7d" }
       );
@@ -63,6 +64,7 @@ export const login = async (req, res) => {
         account: {
           id: team.id,
           name: team.name,
+          event_id: team.event_id,
           email: team.email,
           type: "team"
         },
@@ -85,6 +87,7 @@ export const login = async (req, res) => {
           id: member.Team.id,
           id_member: member.id,
           email_member: email,
+          event_id: member.event_id,
           type: "member",
         },
         JWT_SECRET,
@@ -98,6 +101,7 @@ export const login = async (req, res) => {
           id: member.id,
           name: member.name,
           email: member.email,
+          event_id: member.event_id,
           type: "member"
         },
       });

@@ -8,10 +8,16 @@ export const createEvent = (req, res) => {
     .catch((e) => res.status(500).json({ message: "Internal Server Error", error: e.message }));
 };
 
-export const listEvents = (req, res) => {
-  Event.findAll({ include: [{ model: User, attributes: ["name"] }], order: [["date", "DESC"]] })
-    .then((list) => res.json(list))
-    .catch(() => res.status(500).json({ message: "Internal Server Error" }));
+export const listEvents = async (req, res) => {
+  try {
+    const events = await Event.findAll({ include: [{ model: User, as: "creator", attributes: ["name"] }], order: [["date", "DESC"]] })
+    return res.json(events)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({
+      message: "Internal Server Error"
+    })
+  }
 };
 
 export const getEvent = (req, res) => {

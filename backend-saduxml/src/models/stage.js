@@ -1,64 +1,59 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes } from "sequelize";
 
 export default (sequelize) => {
   const Stage = sequelize.define(
-    'Stage',
+    "Stage",
     {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
+
+      event_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: "Relasi ke event tempat stage ini berada",
+        validate: {
+          notEmpty: { msg: "Event ID tidak boleh kosong" },
+        },
+      },
+
+      best_of: {
+        type: DataTypes.INTEGER,
+        defaultValue: 3,
+      },
+
       name: {
         type: DataTypes.STRING,
         allowNull: false,
-        comment: 'Nama babak: Penyisihan, Semifinal, Final, dll',
+        comment: "Nama babak: Penyisihan, Semifinal, Final, dll",
       },
+
       type: {
-        type: DataTypes.ENUM('group_stage', 'knockout', 'final'),
+        type: DataTypes.ENUM("group_stage", "knockout", "final"),
         allowNull: false,
-        defaultValue: 'knockout',
+        defaultValue: "knockout",
       },
+
       order_number: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        comment: "Urutan stage dalam event",
       },
+
       status: {
-        type: DataTypes.ENUM('upcoming', 'ongoing', 'finished'),
-        defaultValue: 'upcoming',
-      },
-      created_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
+        type: DataTypes.ENUM("upcoming", "ongoing", "finished"),
+        defaultValue: "upcoming",
       },
     },
     {
-      tableName: 'stages',
+      tableName: "stages",
       timestamps: true,
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
+      createdAt: "created_at",
+      updatedAt: "updated_at",
     }
   );
-
-  Stage.associate = (models) => {
-    // 1 stage bisa punya banyak match
-    Stage.hasMany(models.Match, {
-      foreignKey: 'stage_id',
-      as: 'matches',
-    });
-
-    // 1 stage bisa punya banyak ronde (opsional)
-    Stage.hasMany(models.MatchRound, {
-      foreignKey: 'stage_id',
-      as: 'rounds',
-    });
-  };
 
   return Stage;
 };

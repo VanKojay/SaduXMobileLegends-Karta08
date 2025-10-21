@@ -1,31 +1,33 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
-export async function up(queryInterface, Sequelize) {
-  // Ambil ID Group A
-  const groups = await queryInterface.sequelize.query(
-    `SELECT id FROM \`groups\` WHERE name = 'Group A';`
-  );
-  const groupId = groups[0][0]?.id || 1;
+export default {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.bulkInsert('group_teams', [
+      // === Event 1: Mobile Legends Championship Season 1 ===
+      { event_id: 1, group_id: 1, team_id: 1, created_at: new Date(), updated_at: new Date() },
+      { event_id: 1, group_id: 1, team_id: 2, created_at: new Date(), updated_at: new Date() },
+      { event_id: 1, group_id: 2, team_id: 3, created_at: new Date(), updated_at: new Date() },
+      { event_id: 1, group_id: 2, team_id: 4, created_at: new Date(), updated_at: new Date() },
 
-  // Ambil ID Team SeedTeam
-  const teams = await queryInterface.sequelize.query(
-    `SELECT id FROM \`teams\` WHERE email = 'seedteam@example.com';`
-  );
-  const teamId = teams[0][0]?.id || 1;
+      // === Event 2: Dwi Keren Cup 2025 ===
+      { event_id: 2, group_id: 3, team_id: 1, created_at: new Date(), updated_at: new Date() },
+      { event_id: 2, group_id: 3, team_id: 2, created_at: new Date(), updated_at: new Date() },
+      { event_id: 2, group_id: 4, team_id: 3, created_at: new Date(), updated_at: new Date() },
+      { event_id: 2, group_id: 4, team_id: 4, created_at: new Date(), updated_at: new Date() },
 
-  // Masukkan relasi ke tabel group_teams
-  await queryInterface.bulkInsert('group_teams', [
-    {
-      group_id: groupId,
-      team_id: teamId,
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-  ]);
-}
+      // === Event 3: Alpha eSports Invitational ===
+      { event_id: 3, group_id: 5, team_id: 1, created_at: new Date(), updated_at: new Date() },
+      { event_id: 3, group_id: 5, team_id: 2, created_at: new Date(), updated_at: new Date() },
 
-/** @type {import('sequelize-cli').Migration} */
-export async function down(queryInterface, Sequelize) {
-  await queryInterface.bulkDelete('group_teams', null, {});
-}
+      // === Event 4: SaduX ML Open Tournament ===
+      { event_id: 4, group_id: 6, team_id: 1, created_at: new Date(), updated_at: new Date() },
+      { event_id: 4, group_id: 6, team_id: 2, created_at: new Date(), updated_at: new Date() },
+      { event_id: 4, group_id: 7, team_id: 3, created_at: new Date(), updated_at: new Date() },
+      { event_id: 4, group_id: 8, team_id: 4, created_at: new Date(), updated_at: new Date() },
+    ], {});
+  },
+
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('group_teams', null, {});
+  },
+};

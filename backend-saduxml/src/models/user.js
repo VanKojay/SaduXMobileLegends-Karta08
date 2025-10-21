@@ -1,47 +1,87 @@
 import { DataTypes } from "sequelize";
+import bcrypt from "bcryptjs";
 
 export default (sequelize) => {
-  const User = sequelize.define("User", {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING(191), allowNull: false },
-    email: { type: DataTypes.STRING(191), allowNull: false, unique: true },
-    password: { type: DataTypes.STRING(255), allowNull: false },
-    verified: { type: DataTypes.BOOLEAN, defaultValue: false },
-    verify_token: { type: DataTypes.STRING(255), allowNull: true },
-  }, {
-    tableName: "users",
-    timestamps: true,
-    createdAt: "created_at",
-    updatedAt: false,
+  const User = sequelize.define(
+    "User",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
 
-    // 🔒 Default scope: password tidak akan muncul otomatis
-    defaultScope: {
-      attributes: { exclude: ["password"] },
-    },
+      name: {
+        type: DataTypes.STRING(191),
+        allowNull: false,
+      },
 
-    // Kalau butuh ambil password (misal untuk login)
-    scopes: {
-      withPassword: {
-        attributes: { include: ["password"] },
+      email: {
+        type: DataTypes.STRING(191),
+        allowNull: false,
+        unique: true,
+      },
+
+      password: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
+
+      role: {
+        type: DataTypes.ENUM("super_admin", "admin"),
+        allowNull: false,
+        defaultValue: "admin",
+        comment: "super_admin = pengelola aplikasi, admin = pengelola event",
+      },
+
+      event_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: "Hanya digunakan jika role = admin (mengelola satu event)",
+      },
+
+      verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      verify_token: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
       },
     },
+    {
+      tableName: "users",
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: false,
 
-    // 🔥 Hooks untuk hash password sebelum disimpan
-    hooks: {
-      beforeCreate: async (team) => {
-        if (team.password) {
-          const salt = await bcrypt.genSalt(10);
-          team.password = await bcrypt.hash(team.password, salt);
-        }
+      defaultScope: {
+        attributes: { exclude: ["password"] },
       },
-      beforeUpdate: async (team) => {
-        if (team.changed("password")) {
-          const salt = await bcrypt.genSalt(10);
-          team.password = await bcrypt.hash(team.password, salt);
-        }
-      }
+
+      scopes: {
+        withPassword: {
+          attributes: { include: ["password"] },
+        },
+      },
+
+      hooks: {
+        beforeCreate: async (user) => {
+          if (user.password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(user.password, salt);
+          }
+        },
+        beforeUpdate: async (user) => {
+          if (user.changed("password")) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(user.password, salt);
+          }
+        },
+      },
     }
-  });
+  );
 
   return User;
 };
