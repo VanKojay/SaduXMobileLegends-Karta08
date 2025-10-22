@@ -4,7 +4,7 @@ import { authMiddleware, isAdminAllowedMiddleware, isNotMemberAllowedMiddleware 
 const router = express.Router();
 
 router.get("/", authMiddleware, isAdminAllowedMiddleware, listTeams);
-router.put("/:id", authMiddleware, isAdminAllowedMiddleware, updateTeam);
+router.put("/:id", authMiddleware, isNotMemberAllowedMiddleware, updateTeam);
 router.get("/get-team", authMiddleware, getTeam);
 router.get("/get-members", authMiddleware, listMembers);
 router.post("/register", registerTeam);
