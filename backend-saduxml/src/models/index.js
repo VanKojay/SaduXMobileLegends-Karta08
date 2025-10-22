@@ -46,32 +46,32 @@ User.hasMany(Event, { foreignKey: "created_by", as: "createdEvents" });
 Event.belongsTo(User, { foreignKey: "created_by", as: "creator" });
 
 // Jika admin hanya mengelola 1 event
-User.belongsTo(Event, { foreignKey: "event_id", as: "managedEvent" });
-Event.hasMany(User, { foreignKey: "event_id", as: "admins" });
+User.belongsTo(Event, { foreignKey: "event_id" });
+Event.hasMany(User, { foreignKey: "event_id" });
 
 // ====================================================================
 // 🔗 RELASI EVENT DENGAN ENTITAS TURUNAN
 // ====================================================================
 
 // Event - Team
-Event.hasMany(Team, { foreignKey: "event_id", as: "teams" });
-Team.belongsTo(Event, { foreignKey: "event_id", as: "event" });
+Event.hasMany(Team, { foreignKey: "event_id" });
+Team.belongsTo(Event, { foreignKey: "event_id" });
 
 // Event - Group
-Event.hasMany(Group, { foreignKey: "event_id", as: "groups" });
-Group.belongsTo(Event, { foreignKey: "event_id", as: "event" });
+Event.hasMany(Group, { foreignKey: "event_id" });
+Group.belongsTo(Event, { foreignKey: "event_id" });
 
 // Event - Stage
-Event.hasMany(Stage, { foreignKey: "event_id", as: "stages" });
-Stage.belongsTo(Event, { foreignKey: "event_id", as: "event" });
+Event.hasMany(Stage, { foreignKey: "event_id" });
+Stage.belongsTo(Event, { foreignKey: "event_id" });
 
 // Event - Match
-Event.hasMany(Match, { foreignKey: "event_id", as: "matches" });
-Match.belongsTo(Event, { foreignKey: "event_id", as: "event" });
+Event.hasMany(Match, { foreignKey: "event_id" });
+Match.belongsTo(Event, { foreignKey: "event_id" });
 
 // Event - MatchRound
-Event.hasMany(MatchRound, { foreignKey: "event_id", as: "matchRounds" });
-MatchRound.belongsTo(Event, { foreignKey: "event_id", as: "event" });
+Event.hasMany(MatchRound, { foreignKey: "event_id" });
+MatchRound.belongsTo(Event, { foreignKey: "event_id" });
 
 // ====================================================================
 // 🔗 RELASI TEAM, MEMBER, DAN GROUP

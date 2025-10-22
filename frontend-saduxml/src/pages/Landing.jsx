@@ -282,14 +282,14 @@ const Landing = () => {
           </motion.div>
 
           {/* Hero Banner - Tournament Highlight */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.8 }}
             className="mt-16 px-4 sm:px-6 lg:px-8"
           >
             <HeroBanner />
-          </motion.div>
+          </motion.div> */}
 
           {/* Scroll Indicator */}
           <motion.div 
