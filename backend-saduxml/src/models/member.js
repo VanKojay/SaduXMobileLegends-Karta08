@@ -53,6 +53,12 @@ export default (sequelize) => {
         },
       },
 
+      is_main_player: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+
       email: {
         type: DataTypes.STRING(191),
         allowNull: true,

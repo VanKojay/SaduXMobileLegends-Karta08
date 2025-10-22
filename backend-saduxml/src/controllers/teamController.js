@@ -71,6 +71,7 @@ export const listTeams = async (req, res) => {
 
   try {
     let teams = []
+    console.log(req.user)
     if (req.user.type !== "super_admin") {
       teams = await Team.findAll({
         include: [
@@ -224,13 +225,13 @@ export const addMember = async (req, res) => {
 
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
 
-    const { ml_id, name, email, phone, role } = req.body;
+    const { ml_id, name, email, phone, role, is_main_player } = req.body;
     if (!ml_id || !name) return res.status(400).json({ message: "Missing required fields: ml_id or name" });
 
     // Cek jumlah member di tim
-    const memberCount = await Member.count({ where: { team_id: teamId } });
+    const memberCount = await Member.count({ where: { team_id: teamId, is_main_player: true } });
     if (memberCount >= 5) {
-      return res.status(400).json({ message: "Team member limit reached (5)" });
+      return res.status(400).json({ message: "Pemain utama hanya bisa (5)" });
     }
 
     // Buat member baru
@@ -241,7 +242,8 @@ export const addMember = async (req, res) => {
       name,
       email: email || null,
       phone: phone || null,
-      role: role || "Gold Lane"
+      role: role || "Gold Lane",
+      is_main_player
     });
 
     return res.status(201).json(member);

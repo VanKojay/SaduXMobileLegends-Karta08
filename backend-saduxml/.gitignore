@@ -18,6 +18,8 @@ pids/
 tmp/
 temp/
 
+config/
+
 # Coverage and test output
 coverage/
 .nyc_output/
