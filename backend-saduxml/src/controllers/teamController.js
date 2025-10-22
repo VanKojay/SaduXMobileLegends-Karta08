@@ -150,48 +150,43 @@ export const listMembers = async (req, res) => {
 
 export const getTeam = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const team = await Team.findByPk(req.user.id, {
-      include: [
-        {
-          model: Member,
-          // Return semua field member
-=======
-    let team = []
-    if (req.user.type !== "super_admin") {
-      team = await Team.findOne({
-        where: {
-          id: req.user.id,
-          event_id: req.user.event_id
->>>>>>> e1c8ac4356999dd5fc0b52074ad2feb53dd375c0
-        },
+    // Cek apakah kamu ingin cari by PK atau by ID dari user
+    let team;
+
+    if (req.user.id) {
+      team = await Team.findByPk(req.user.id, {
         include: [
           {
             model: Member,
-            // attributes: ["id", "name"], // ambil kolom tertentu
+            // Jika ingin ambil semua kolom, tidak perlu attributes
+            // Jika ingin ambil kolom tertentu, uncomment baris ini:
+            // attributes: ["id", "name"],
           },
         ],
-      })
+      });
     } else {
       team = await Team.findOne({
-        where: {
-          id: req.user.id,
-        },
+        where: { id: req.user.id },
         include: [
           {
             model: Member,
-            // attributes: ["id", "name"], // ambil kolom tertentu
+            // attributes: ["id", "name"], // opsional
           },
         ],
-      })
+      });
     }
-    if (!team) return res.status(404).json({ message: "Not found" });
+
+    if (!team) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
     res.json(team);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export const verifyTeam = async (req, res) => {
   try {
@@ -224,28 +219,42 @@ export const verifyTeam = async (req, res) => {
 
 export const addMember = async (req, res) => {
   try {
-    const teamId = req.user && req.user.id;
-    const eventId = req?.user?.event_id || req?.body?.event_id;
+    const { id: teamId, event_id: userEventId } = req.user || {};
+    const eventId = req.body.event_id || userEventId;
+
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
+
     const { ml_id, name, email, phone, role } = req.body;
-<<<<<<< HEAD
-    if (!ml_id || !name) return res.status(400).json({ message: "Missing fields" });
-    const count = await Member.count({ where: { team_id: teamId } });
-    if (count >= 5) return res.status(400).json({ message: "Team member limit reached (5)" });
-    const member = await Member.create({ team_id: teamId, event_id: eventId, ml_id, name, email, phone, role: role || 'Gold Lane' });
-=======
-    if (!ml_id || !role || !name || !email || !phone) return res.status(400).json({ message: "Missing required fields" });
-    const count = await Member.count({ where: { team_id: teamId } });
-    if (count >= 5) return res.status(400).json({ message: "Team member limit reached (5)" });
-    const member = await Member.create({ team_id: teamId, event_id: eventId, ml_id, name, email, phone, role });
->>>>>>> e1c8ac4356999dd5fc0b52074ad2feb53dd375c0
+    if (!ml_id || !name) return res.status(400).json({ message: "Missing required fields: ml_id or name" });
+
+    // Cek jumlah member di tim
+    const memberCount = await Member.count({ where: { team_id: teamId } });
+    if (memberCount >= 5) {
+      return res.status(400).json({ message: "Team member limit reached (5)" });
+    }
+
+    // Buat member baru
+    const member = await Member.create({
+      team_id: teamId,
+      event_id: eventId,
+      ml_id,
+      name,
+      email: email || null,
+      phone: phone || null,
+      role: role || "Gold Lane"
+    });
+
     return res.status(201).json(member);
+
   } catch (err) {
     console.error(err);
-    if (err.name === "SequelizeUniqueConstraintError") return res.status(409).json({ message: "Member unique constraint" });
+    if (err.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({ message: "Member already exists (unique constraint)" });
+    }
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export const editMember = async (req, res) => {
   try {

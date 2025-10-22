@@ -8,11 +8,11 @@ export default {
 
     await queryInterface.bulkInsert('users', [
       {
-        name: 'Super Admin Dwi',
+        name: 'Super Admin SaduX',
         email: 'superadmin@example.com',
         password: await bcrypt.hash('supersecure', salt),
         role: 'super_admin',
-        event_id: null,
+        event_id: 1,
         verified: true,
         verify_token: null,
         created_at: new Date(),
@@ -22,7 +22,7 @@ export default {
         email: 'admin.alpha@example.com',
         password: await bcrypt.hash('alphaadmin', salt),
         role: 'admin',
-        event_id: null, // Mengelola event Mobile Legends Championship Season 1
+        event_id: 2, // Mengelola event Mobile Legends Championship Season 1
         verified: true,
         verify_token: null,
         created_at: new Date(),
@@ -32,7 +32,7 @@ export default {
         email: 'admin.dwicup@example.com',
         password: await bcrypt.hash('dwicup2025', salt),
         role: 'admin',
-        event_id: null, // Mengelola event Dwi Keren Cup 2025
+        event_id: 3, // Mengelola event Dwi Keren Cup 2025
         verified: true,
         verify_token: null,
         created_at: new Date(),
@@ -42,7 +42,7 @@ export default {
         email: 'admin.alpha.invite@example.com',
         password: await bcrypt.hash('alphainvite', salt),
         role: 'admin',
-        event_id: null,
+        event_id: 3,
         verified: false, // Belum verifikasi
         verify_token: 'token12345',
         created_at: new Date(),
@@ -52,7 +52,7 @@ export default {
         email: 'admin.sadux@example.com',
         password: await bcrypt.hash('saduxrocks', salt),
         role: 'admin',
-        event_id: null,
+        event_id: 4,
         verified: true,
         verify_token: null,
         created_at: new Date(),

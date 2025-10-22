@@ -99,7 +99,6 @@ export const listStages = async (req, res) => {
   const eventId = req.query.event_id || (req.user ? req.user.event_id : null);
 
   try {
-<<<<<<< HEAD
     // Build where clause
     const whereClause = {
       [Op.and]: [
@@ -117,10 +116,6 @@ export const listStages = async (req, res) => {
     }
 
     const stageList = await Stage.findAll({
-=======
-    let stageList = []
-    stageList = await Stage.findAll({
->>>>>>> e1c8ac4356999dd5fc0b52074ad2feb53dd375c0
       include: [
         {
           model: MatchRound,
@@ -170,17 +165,8 @@ export const listStages = async (req, res) => {
           ]
         },
       ],
-<<<<<<< HEAD
       where: whereClause,
       order: [['order_number', 'ASC']]
-=======
-      where: {
-        event_id: req.query.event_id,
-        [Op.or]: [
-          { name: { [Op.like]: `%${keyword}%` } },
-        ],
-      },
->>>>>>> e1c8ac4356999dd5fc0b52074ad2feb53dd375c0
     })
 
     res.json(stageList);
