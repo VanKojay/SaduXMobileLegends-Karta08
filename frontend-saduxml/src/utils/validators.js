@@ -64,6 +64,16 @@ export const validateTeamRegistration = (formData) => {
     errors.email = 'Email tidak valid';
   }
 
+  // Leader name validation
+  if (!formData.leader_name || formData.leader_name.trim().length < 3) {
+    errors.leader_name = 'Nama ketua tim minimal 3 karakter';
+  }
+
+  // Leader phone validation
+  if (!formData.leader_phone || !validatePhone(formData.leader_phone)) {
+    errors.leader_phone = 'Nomor HP ketua tim tidak valid (gunakan format Indonesia)';
+  }
+
   if (!formData.password) {
     errors.password = 'Password wajib diisi';
   } else {

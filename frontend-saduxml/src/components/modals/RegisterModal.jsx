@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Lock, User, AlertCircle, Loader2, Eye, EyeOff, CheckCircle, Download, Calendar, Users as UsersIcon, MapPin } from 'lucide-react';
+import { X, Mail, Lock, User, AlertCircle, Loader2, Eye, EyeOff, CheckCircle, Download, Calendar, Users as UsersIcon, MapPin, Phone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { validateTeamRegistration } from '../../utils/validators';
 import { eventService } from '../../services/api';
@@ -13,6 +13,8 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
     email: '',
     password: '',
     confirmPassword: '',
+    leader_name: '',
+    leader_phone: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -20,7 +22,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const { register } = useAuth();
 
@@ -51,7 +52,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
       // Auto-select jika hanya ada 1 event
       if (activeEvents.length === 1) {
         setFormData(prev => ({ ...prev, event_id: activeEvents[0].id }));
-        setSelectedEvent(activeEvents[0]);
       }
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -117,10 +117,12 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
       // Call register API
       console.log('Calling register API...');
       const result = await register({
-        event_id: formData.event_id,
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        leader_name: formData.leader_name,
+        leader_phone: formData.leader_phone,
+        event_id: formData.event_id,
       });
       
       console.log('Register result:', result);
@@ -153,8 +155,9 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
       email: '',
       password: '',
       confirmPassword: '',
+      leader_name: '',
+      leader_phone: '',
     });
-    setSelectedEvent(null);
     setErrors({});
     onClose();
   };
@@ -254,7 +257,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                             checked={formData.event_id === event.id}
                             onChange={(e) => {
                               setFormData(prev => ({ ...prev, event_id: parseInt(e.target.value) }));
-                              setSelectedEvent(event);
                               if (errors.event_id) {
                                 setErrors(prev => ({ ...prev, event_id: '' }));
                               }
@@ -327,6 +329,31 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                 )}
               </div>
 
+              {/* Leader Name Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Nama Ketua Tim <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="leader_name"
+                    value={formData.leader_name}
+                    onChange={handleChange}
+                    className={`w-full pl-10 pr-4 py-3 bg-gray-800 border ${
+                      errors.leader_name ? 'border-red-500' : 'border-gray-700'
+                    } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                    placeholder="Nama ketua tim"
+                  />
+                </div>
+                {errors.leader_name && (
+                  <p className="mt-1 text-sm text-red-400">{errors.leader_name}</p>
+                )}
+              </div>
+
               {/* Email Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -349,6 +376,31 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                 </div>
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-400">{errors.email}</p>
+                )}
+              </div>
+
+              {/* Leader Phone Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  No. HP Ketua Tim <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="tel"
+                    name="leader_phone"
+                    value={formData.leader_phone}
+                    onChange={handleChange}
+                    className={`w-full pl-10 pr-4 py-3 bg-gray-800 border ${
+                      errors.leader_phone ? 'border-red-500' : 'border-gray-700'
+                    } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                    placeholder="Contoh: 0812-3456-7890"
+                  />
+                </div>
+                {errors.leader_phone && (
+                  <p className="mt-1 text-sm text-red-400">{errors.leader_phone}</p>
                 )}
               </div>
 

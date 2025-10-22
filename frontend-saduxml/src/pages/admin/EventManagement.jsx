@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Calendar, MapPin, Trophy, Users, Search, Plus, Eye, Edit2, Trash2, Filter } from 'lucide-react';
 import { eventService } from '../../services/api';
 import toast from 'react-hot-toast';
-import DashboardHeader from '../../components/common/DashboardHeader';
+import AdminLayout from '../../components/admin/AdminLayout';
 import AddEventModal from '../../components/event/AddEventModal';
 import EditEventModal from '../../components/event/EditEventModal';
 import DeleteEventModal from '../../components/event/DeleteEventModal';
@@ -122,26 +122,19 @@ const EventManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900">
-      <DashboardHeader />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Event Management</h1>
-            <p className="text-gray-400">Manage tournament events and competitions</p>
-          </div>
-          {isSuperAdmin() && (
-            <button
-              onClick={handleAddClick}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-indigo-500/50"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Add Event</span>
-            </button>
-          )}
-        </div>
+    <AdminLayout title="Event Management" subtitle="Manage tournament events and competitions">
+      {/* Header Actions */}
+      <div className="flex items-center justify-end mb-6">
+        {isSuperAdmin() && (
+          <button
+            onClick={handleAddClick}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-indigo-500/50"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Add Event</span>
+          </button>
+        )}
+      </div>
 
         {/* Filters */}
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-6">
@@ -349,13 +342,12 @@ const EventManagement = () => {
           </div>
         )}
 
-        {/* Results Count */}
-        {!isLoading && filteredEvents.length > 0 && (
-          <div className="mt-4 text-center text-sm text-gray-400">
-            Showing {filteredEvents.length} of {events.length} events
-          </div>
-        )}
-      </div>
+      {/* Results Count */}
+      {!isLoading && filteredEvents.length > 0 && (
+        <div className="mt-4 text-center text-sm text-gray-400">
+          Showing {filteredEvents.length} of {events.length} events
+        </div>
+      )}
 
       {/* Modals */}
       <AddEventModal
@@ -392,7 +384,7 @@ const EventManagement = () => {
         }}
         event={selectedEvent}
       />
-    </div>
+    </AdminLayout>
   );
 };
 
