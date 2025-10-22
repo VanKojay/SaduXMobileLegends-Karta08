@@ -27,6 +27,16 @@ export default {
         allowNull: false,
       },
 
+      leader_name: {
+        type: Sequelize.STRING(191),
+        allowNull: true,
+      },
+
+      leader_phone: {
+        type: Sequelize.STRING(191),
+        allowNull: true,
+      },
+
       email: {
         type: Sequelize.STRING(191),
         allowNull: false,
