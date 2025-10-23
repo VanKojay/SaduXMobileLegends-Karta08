@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "shhhhh";
 
 export const registerTeam = async (req, res) => {
   try {
-    const { name, email, password, event_id } = req.body;
+    const { name, email, password, event_id, leader_name, leader_phone } = req.body;
     if (!email || !password || !name || !event_id)
       return res.status(400).json({ message: "Missing fields" });
 
