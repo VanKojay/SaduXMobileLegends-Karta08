@@ -27,6 +27,11 @@ export default {
         allowNull: false,
       },
 
+      domicile: {
+        type: Sequelize.STRING(191),
+        allowNull: true,
+      },
+
       leader_name: {
         type: Sequelize.STRING(191),
         allowNull: true,

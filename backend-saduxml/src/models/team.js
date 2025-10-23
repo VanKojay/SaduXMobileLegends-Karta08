@@ -15,6 +15,7 @@ export default (sequelize) => {
 
     name: { type: DataTypes.STRING(191), allowNull: false },
     
+    domicile: { type: DataTypes.STRING(191), allowNull: true },
     leader_name: { type: DataTypes.STRING(191), allowNull: true },
     leader_phone: { type: DataTypes.STRING(191), allowNull: true },
 

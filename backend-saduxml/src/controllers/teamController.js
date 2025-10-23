@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "shhhhh";
 
 export const registerTeam = async (req, res) => {
   try {
-    const { name, email, password, event_id, leader_name, leader_phone } = req.body;
+    const { name, email, password, event_id, leader_name, leader_phone, domicile } = req.body;
     if (!email || !password || !name || !event_id)
       return res.status(400).json({ message: "Missing fields" });
 
@@ -47,7 +47,8 @@ export const registerTeam = async (req, res) => {
       verified: false,
       leader_name,
       leader_phone,
-      event_id
+      event_id,
+      domicile
     });
 
     // Kirim email verifikasi (async)
@@ -70,7 +71,7 @@ export const registerTeam = async (req, res) => {
 export const updateTeam = async (req, res) => {
   try {
     const { id } = req.params; // ID team yang mau di-update
-    const { name, email, password, leader_name, leader_phone } = req.body;
+    const { name, email, password, leader_name, leader_phone, domicile } = req.body;
 
     const event_id = req.user.event_id
 
@@ -118,6 +119,7 @@ export const updateTeam = async (req, res) => {
     if (leader_name) updateData.leader_name = leader_name;
     if (leader_phone) updateData.leader_phone = leader_phone;
     if (event_id) updateData.event_id = event_id;
+    if (domicile) updateData.domicile = domicile;
 
     // Jika ingin ganti password, hash dulu
     if (password) {
