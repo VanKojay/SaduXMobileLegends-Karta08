@@ -1,9 +1,10 @@
 import express from "express";
-import { registerTeam, verifyTeam, addMember, listTeams, getTeam, listMembers, removeMember, editMember } from "../controllers/teamController.js";
+import { registerTeam, verifyTeam, addMember, listTeams, getTeam, listMembers, removeMember, editMember, updateTeam } from "../controllers/teamController.js";
 import { authMiddleware, isAdminAllowedMiddleware, isNotMemberAllowedMiddleware } from "../middleware/auth.js";
 const router = express.Router();
 
 router.get("/", authMiddleware, isAdminAllowedMiddleware, listTeams);
+router.put("/:id", authMiddleware, isNotMemberAllowedMiddleware, updateTeam);
 router.get("/get-team", authMiddleware, getTeam);
 router.get("/get-members", authMiddleware, listMembers);
 router.post("/register", registerTeam);

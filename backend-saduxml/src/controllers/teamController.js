@@ -45,6 +45,8 @@ export const registerTeam = async (req, res) => {
       verify_token: verifyToken,
       verify_expires: verifyExpires,
       verified: false,
+      leader_name,
+      leader_phone,
       event_id
     });
 
@@ -64,6 +66,80 @@ export const registerTeam = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const updateTeam = async (req, res) => {
+  try {
+    const { id } = req.params; // ID team yang mau di-update
+    const { name, email, password, leader_name, leader_phone } = req.body;
+
+    const event_id = req.user.event_id
+
+    // Validasi minimal input
+    if (!name && !email && !password && !leader_name && !leader_phone && !event_id) {
+      return res.status(400).json({ message: "No fields to update." });
+    }
+
+    // Cek apakah team ada
+    const team = await Team.findByPk(id);
+    if (!team) {
+      return res.status(404).json({ message: "Team not found." });
+    }
+
+    // Jika bukan super_admin, batasi update hanya untuk event user sendiri
+    if (req.user.type !== "super_admin" && team.event_id !== req.user.event_id) {
+      return res.status(403).json({ message: "Not authorized to update this team." });
+    }
+
+    // Jika ingin ganti event, validasi event baru
+    if (event_id && event_id !== team.event_id) {
+      const event = await Event.findByPk(event_id);
+      if (!event) {
+        return res.status(404).json({ message: "New event not found." });
+      }
+    }
+
+    // Jika ingin ganti email, pastikan belum dipakai team lain
+    if (email && email !== team.email) {
+      const existingEmail = await Team.findOne({
+        where: {
+          email,
+          id: { [Op.ne]: id }, // ⛔ cari email sama tapi bukan milik team ini
+        },
+      });
+      if (existingEmail) {
+        return res.status(409).json({ message: "Email already used by another team." });
+      }
+    }
+
+    // Siapkan data yang akan diupdate
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (leader_name) updateData.leader_name = leader_name;
+    if (leader_phone) updateData.leader_phone = leader_phone;
+    if (event_id) updateData.event_id = event_id;
+
+    // Jika ingin ganti password, hash dulu
+    if (password) {
+      const bcrypt = await import("bcryptjs");
+      const salt = bcrypt.genSaltSync(10);
+      updateData.password = bcrypt.hashSync(password, salt);
+    }
+
+    // Jalankan update
+    await team.update(updateData);
+
+    return res.status(200).json({
+      message: "Team updated successfully.",
+      data: team,
+    });
+
+  } catch (err) {
+    console.error("Error updating team:", err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 
 export const listTeams = async (req, res) => {
@@ -224,13 +300,13 @@ export const addMember = async (req, res) => {
 
     if (!teamId) return res.status(401).json({ message: "Not authorized" });
 
-    const { ml_id, name, email, phone, role } = req.body;
+    const { ml_id, name, email, phone, role, is_main_player } = req.body;
     if (!ml_id || !name) return res.status(400).json({ message: "Missing required fields: ml_id or name" });
 
     // Cek jumlah member di tim
-    const memberCount = await Member.count({ where: { team_id: teamId } });
+    const memberCount = await Member.count({ where: { team_id: teamId, is_main_player: true } });
     if (memberCount >= 5) {
-      return res.status(400).json({ message: "Team member limit reached (5)" });
+      return res.status(400).json({ message: "Pemain utama hanya bisa (5)" });
     }
 
     // Buat member baru
@@ -241,7 +317,8 @@ export const addMember = async (req, res) => {
       name,
       email: email || null,
       phone: phone || null,
-      role: role || "Gold Lane"
+      role: role || "Gold Lane",
+      is_main_player
     });
 
     return res.status(201).json(member);

@@ -119,12 +119,10 @@ export const listStages = async (req, res) => {
       include: [
         {
           model: MatchRound,
-          as: "rounds",
           attributes: ["id", "round_number", "score_team1", "score_team2", "winner_id", 'status'],
           include: [
             {
               model: Match,
-              as: "match",
               attributes: ["id", "match_date", "team1_id", "team2_id", "winner_id", "group_id", "status", "round", "score_team1", "score_team2"],
               include: [
                 {

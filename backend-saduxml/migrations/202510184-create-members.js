@@ -35,6 +35,12 @@ export default {
         comment: 'Relasi ke team tempat member ini tergabung',
       },
 
+      is_main_player: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+
       // 🔹 Data pemain
       ml_id: {
         type: Sequelize.STRING(100),

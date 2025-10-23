@@ -14,6 +14,10 @@ export default (sequelize) => {
     },
 
     name: { type: DataTypes.STRING(191), allowNull: false },
+    
+    leader_name: { type: DataTypes.STRING(191), allowNull: true },
+    leader_phone: { type: DataTypes.STRING(191), allowNull: true },
+
     email: { type: DataTypes.STRING(191), allowNull: false, unique: true },
     password: { type: DataTypes.STRING(255), allowNull: false },
     verified: { type: DataTypes.BOOLEAN, defaultValue: false },
