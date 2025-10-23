@@ -152,7 +152,7 @@ export const listTeams = async (req, res) => {
         include: [
           {
             model: Member,
-            attributes: ["id", "name"], // ambil kolom tertentu
+            // attributes: ["id", "name"], // ambil kolom tertentu
           },
         ],
         where: {
@@ -168,7 +168,7 @@ export const listTeams = async (req, res) => {
         include: [
           {
             model: Member,
-            attributes: ["id", "name"], // ambil kolom tertentu
+            // attributes: ["id", "name"], // ambil kolom tertentu
           },
         ],
         where: {
